@@ -13,7 +13,7 @@ class BikeCard extends StatelessWidget {
     super.key,
     required this.bike,
     required this.inMyBikes,
-    required this.onAction
+    required this.onAction,
   });
 
   @override
@@ -24,10 +24,10 @@ class BikeCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(36.0),
         ),
-        color: Theme.of(context).colorScheme.tertiaryContainer,
+        color: Theme.of(context).colorScheme.primaryContainer,
         elevation: 0,
         child: InkWell(
-          onTap: (){
+          onTap: () {
             bikeDetails(context, bike, inMyBikes, onAction);
           },
           borderRadius: BorderRadius.circular(36.0),
@@ -37,10 +37,10 @@ class BikeCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 28.0,
-                  backgroundImage: (bike.image != null && bike.image!.isNotEmpty)
+                  backgroundImage:
+                      (bike.image != null && bike.image!.isNotEmpty)
                       ? MemoryImage(base64Decode(bike.image!))
-                      : AssetImage("assets/images/default_bike.png") ,
-                  backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+                      : AssetImage("assets/images/default_bike.png"),
                 ),
 
                 const SizedBox(width: 12),
@@ -50,27 +50,32 @@ class BikeCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("${bike.brand} ${bike.model} ${bike.modelYear}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 18.0
-                      ),
-                      maxLines: 1,
+                      Text(
+                        "${bike.brand} ${bike.model} ${bike.modelYear}",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 18.0,
+                        ),
+                        maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
 
-                      Text("${bike.engineCc} CC",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14.0
-                      ),)
-
+                      Text(
+                        "${bike.engineCc} CC",
+                        style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          fontSize: 14.0,
+                        ),
+                      ),
                     ],
                   ),
                 ),
-                IconButton(onPressed: (){
-                  onAction();
-                }, icon: Icon(inMyBikes? Icons.remove : Icons.add))
+                IconButton(
+                  onPressed: () {
+                    onAction();
+                  },
+                  icon: Icon(inMyBikes ? Icons.remove : Icons.add),
+                ),
               ],
             ),
           ),
@@ -79,4 +84,3 @@ class BikeCard extends StatelessWidget {
     );
   }
 }
-

@@ -24,7 +24,10 @@ class MyApp extends StatelessWidget {
       title: 'fuelsense',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(0xFF1E3A5F),
+          contrastLevel: 0.15,
+        ),
       ),
     );
   }

@@ -9,8 +9,10 @@ class NavDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(color: Colors.deepPurple),
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
             child: Text(
               'FuelSense',
               style: TextStyle(color: Colors.white, fontSize: 24),
@@ -62,6 +64,14 @@ class NavDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context);
               Navigator.pushReplacementNamed(context, '/add_bike');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.hourglass_bottom_rounded),
+            title: const Text('Pending Bikes'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/pending_bikes');
             },
           ),
         ],

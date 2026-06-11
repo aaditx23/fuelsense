@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/data/remote/bike/schema/bike_model.dart';
 import 'package:fuelsense/views/screens/my_bikes/widgets/my_bike_card.dart';
 import 'package:fuelsense/views/widgets/common_scaffold.dart';
+import 'package:fuelsense/views/widgets/response_text.dart';
 import 'package:fuelsense/views/widgets/search_bar_widget.dart';
 import 'my_bikes_notifier.dart';
 
@@ -66,7 +67,12 @@ class _BikesScreenState extends ConsumerState<MyBikesScreen> {
             child: state.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : state.message != null && !state.isSuccess
-                ? Center(child: Text(state.message!))
+                ? Center(
+                    child: ResponseText(
+                      success: state.isSuccess,
+                      message: state.message!,
+                    ),
+                  )
                 : state.myBikes.isNotEmpty
                 ? ListView.builder(
                     itemCount: filteredBikes.length,

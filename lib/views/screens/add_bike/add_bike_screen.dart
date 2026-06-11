@@ -12,6 +12,11 @@ import 'package:fuelsense/views/widgets/outlined_text_field.dart';
 
 import '../../../data/dropdown_values/fuel_type.dart';
 
+/*
+response message: show as toast on top
+fix flicker and change loading indicator to animation
+*/
+
 class AddBikeScreen extends ConsumerStatefulWidget {
   const AddBikeScreen({super.key});
 

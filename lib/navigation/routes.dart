@@ -3,6 +3,7 @@ import 'package:fuelsense/views/screens/add_bike/add_bike_screen.dart';
 import 'package:fuelsense/views/screens/auth/login/login_screen.dart';
 import 'package:fuelsense/views/screens/auth/signup/signup_screen.dart';
 import 'package:fuelsense/views/screens/my_bikes/my_bikes_screen.dart';
+import 'package:fuelsense/views/screens/pending_bikes/pending_bike_screen.dart';
 import 'package:fuelsense/views/screens/profile/profile_screen.dart';
 import 'package:fuelsense/views/screens/screen02/screen02.dart';
 
@@ -19,6 +20,7 @@ Map<String, WidgetBuilder> getRoute(context) {
     "/bikes": (context) => BikesScreen(),
     "/my_bikes": (context) => MyBikesScreen(),
     "/add_bike": (context) => AddBikeScreen(),
+    "/pending_bikes": (context) => PendingBikeScreen()
   };
 }
 
