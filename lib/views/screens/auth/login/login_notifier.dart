@@ -23,23 +23,32 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
   Future<void> login(LoginRequest loginRequest) async {
     state = state.copyWith(isLoading: true, message: null, isSuccess: false);
-    final response = await authRepository.login(loginRequest);
+    try{
+      final response = await authRepository.login(loginRequest);
 
-    final userResponse = response.data;
-    if(userResponse != null){
-      final user = userResponse.toEntity(loginRequest.password);
+      final userResponse = response.data;
+      if(userResponse != null){
+        final user = userResponse.toEntity(loginRequest.password);
 
-      final userId = await userDao.createUser(user);
-      prefs.saveUserId(userId);
-      print("USER ID LOGIN NOTIFIER: $userId");
-      if(response.access_token != null) await prefs.saveToken(response.access_token!);
+        final userId = await userDao.createUser(user);
+        prefs.saveUserId(userId);
+        print("USER ID LOGIN NOTIFIER: $userId");
+        if(response.access_token != null) await prefs.saveToken(response.access_token!);
+      }
+      state = state.copyWith(
+        isLoading: false,
+        isSuccess: response.success,
+        message: response.message,
+        code: response.code,
+      );
     }
-    state = state.copyWith(
-      isLoading: false,
-      isSuccess: response.success,
-      message: response.message,
-      code: response.code,
-    );
+    catch (e){
+      state = state.copyWith(
+        isLoading: false,
+        isSuccess: false,
+        message: e.toString(),
+      );
+    }
   }
 }
 

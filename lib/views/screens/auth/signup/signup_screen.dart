@@ -61,15 +61,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     });
 
     void onSignup() {
-      final signupRequest = SignupRequest(
-        username: _nameController.text.trim(),
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-        profile_image: _profileImage?.trim(),
-        role: _selectedRole,
-      );
-      print("ISGNUP REQUEST: ${signupRequest.profile_image}");
-      ref.read(signupNotifier.notifier).signup(signupRequest);
+      if(_formKey.currentState!.validate()){
+        final signupRequest = SignupRequest(
+          username: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          profile_image: _profileImage?.trim(),
+          role: _selectedRole,
+        );
+        print("ISGNUP REQUEST: ${signupRequest.profile_image}");
+        ref.read(signupNotifier.notifier).signup(signupRequest);
+      }
     }
 
     return Scaffold(
@@ -141,13 +143,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       ElevatedButton(
                         onPressed: state.isLoading
                             ? null
-                            : () {
-                                if (_formKey.currentState?.validate() ?? false) {
-                                  onSignup();
-                                }
-                              },
+                            : () => onSignup(),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 0,
+                            backgroundColor: Theme.of(context).colorScheme.primaryContainer
                         ),
                         child: state.isLoading
                             ? const SizedBox(

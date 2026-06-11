@@ -49,11 +49,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     void onLogin() {
-      final loginRequest = LoginRequest(
-        username: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      ref.read(loginNotifier.notifier).login(loginRequest);
+      if(_formKey.currentState!.validate()){
+        final loginRequest = LoginRequest(
+          username: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+        );
+        ref.read(loginNotifier.notifier).login(loginRequest);
+      }
     }
 
     return Scaffold(
@@ -89,12 +91,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       const SizedBox(height: 24),
                       OutlinedTextField(
                         controller: _emailController,
-                        labelText: 'Email',
+                        labelText: 'Email/Username',
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: const Icon(Icons.email),
                         validator: (v) {
-                          if (v == null || v.trim().isEmpty) return 'Enter email';
-                          if (!v.contains('@')) return 'Enter a valid email';
+                          if (v == null || v.trim().isEmpty) return 'Enter Email/Username';
                           return null;
                         },
                       ),
@@ -117,7 +118,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       const SizedBox(height: 8),
                       ElevatedButton(
-                        onPressed: () => onLogin(),
+                        onPressed: state.isLoading
+                        ? null
+                        : () => onLogin(),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           elevation: 0,

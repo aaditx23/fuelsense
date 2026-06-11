@@ -22,21 +22,31 @@ class SignupNotifier extends StateNotifier<SignupState> {
   }
   Future<void> signup(SignupRequest signupRequest) async {
     state = state.copyWith(isLoading: true, message: null);
-    final response = await authRepository.signup(signupRequest);
-    final userResponse = response.data;
-    if(userResponse != null){
-      final user = userResponse.toEntity(signupRequest.password);
-      final userId = await userDao.createUser(user);
-      prefs.saveUserId(userId);
-      if(response.access_token != null) await prefs.saveToken(response.access_token!);
+    try{
+      final response = await authRepository.signup(signupRequest);
+      final userResponse = response.data;
+      if(userResponse != null){
+        final user = userResponse.toEntity(signupRequest.password);
+        final userId = await userDao.createUser(user);
+        prefs.saveUserId(userId);
+        if(response.access_token != null) await prefs.saveToken(response.access_token!);
 
+      }
+      state = state.copyWith(
+        isLoading: false,
+        isSuccess: response.success,
+        message: response.message,
+        code: response.code,
+      );
     }
+
+    catch (e){
     state = state.copyWith(
-      isLoading: false,
-      isSuccess: response.success,
-      message: response.message,
-      code: response.code,
+    isLoading: false,
+    isSuccess: false,
+    message: e.toString(),
     );
+    }
   }
 }
 
