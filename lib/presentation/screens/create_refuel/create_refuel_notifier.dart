@@ -223,8 +223,10 @@ class CreateRefuelNotifier extends StateNotifier<CreateRefuelState> {
               tripMeterReading: state.tripMeterReading,
               odometerReading: state.odometerReading,
               fuelLiter: state.fuelLiter,
-              fuelPrice:
-                  state.fuelPricePerLiter, // price per liter → DB fuelPrice
+              fuelPrice: state.fuelPricePerLiter,
+              entryType: state.refuelType == CreateRefuelType.refuel
+                  ? RefuelEntryType.reserveComplete
+                  : RefuelEntryType.topup,
             );
             break;
         }

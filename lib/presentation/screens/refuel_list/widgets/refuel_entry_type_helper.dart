@@ -16,11 +16,11 @@ class RefuelEntryTypeHelper {
   static IconData getEntryTypeIcon(RefuelEntryType type) {
     switch (type) {
       case RefuelEntryType.reserveIncomplete:
-        return Icons.warning;
+        return Icons.warning_amber_rounded;
       case RefuelEntryType.reserveComplete:
-        return Icons.local_gas_station;
+        return Icons.local_gas_station_rounded;
       case RefuelEntryType.topup:
-        return Icons.add;
+        return Icons.water_drop_rounded;
     }
   }
 
@@ -29,7 +29,7 @@ class RefuelEntryTypeHelper {
       case RefuelEntryType.reserveIncomplete:
         return 'Reserve Hit';
       case RefuelEntryType.reserveComplete:
-        return 'Refueled';
+        return 'Refuel';
       case RefuelEntryType.topup:
         return 'Top-up';
     }

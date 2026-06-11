@@ -109,7 +109,7 @@ class RefuelCard extends ConsumerWidget {
                       label: 'Cost',
                       value:
                           '৳${formatDecimal(refuel.fuelPrice! * refuel.fuelLiter!)}',
-                      icon: Icons.currency_rupee,
+                      icon: Icons.attach_money_rounded,
                     ),
                   ),
                 ],

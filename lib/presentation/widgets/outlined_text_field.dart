@@ -55,11 +55,20 @@ class OutlinedTextField extends StatelessWidget {
         hintText: hintText,
         errorText: errorText,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outlineVariant,
+          ),
+        ),
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
         labelStyle: labelStyle,
         hintStyle: hintStyle,
         floatingLabelStyle: floatingLabelStyle,
+      ),
+      style: TextStyle(
+        color: enabled ? null : Theme.of(context).colorScheme.onSurface,
       ),
       validator: validator,
       keyboardType: keyboardType,

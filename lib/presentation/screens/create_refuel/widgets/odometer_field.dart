@@ -72,7 +72,21 @@ class _OdometerFieldState extends ConsumerState<OdometerField> {
         .watch(lastTripMeterReadingProvider(widget.userBikeId))
         .value;
 
+    // When disabled (pre-filled from incomplete entry), always sync controller
+    // from state — ref.listen alone misses state that was set before widget subscribed.
+    if (!widget.enabled && state.odometerReading != null) {
+      final formatted = state.odometerReading.toString();
+      if (_controller.text != formatted) _controller.text = formatted;
+    }
+
     ref.listen(createRefuelNotifierProvider, (prev, next) {
+      // Sync controller when pre-filled from incomplete entry
+      if (!widget.enabled && next.odometerReading != null) {
+        final formatted = next.odometerReading.toString();
+        if (_controller.text != formatted) _controller.text = formatted;
+        return;
+      }
+
       if (_isFocused || _isManual) return;
 
       final currentTrip = next.tripMeterReading;

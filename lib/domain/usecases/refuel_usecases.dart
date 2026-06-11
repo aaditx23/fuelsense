@@ -130,6 +130,7 @@ class CreateTopupEntryUseCase {
     required double? odometerReading,
     required double? fuelLiter,
     required double? fuelPrice,
+    RefuelEntryType entryType = RefuelEntryType.topup,
   }) async {
     // Check if there's an incomplete reserve entry (user must complete it first)
     final incompleteEntry = await _refuelRepository.getIncompleteReserveEntry(
@@ -150,7 +151,7 @@ class CreateTopupEntryUseCase {
       fuelLiter: fuelLiter,
       fuelPrice: fuelPrice,
       createdAt: DateTime.now(),
-      entryType: RefuelEntryType.topup,
+      entryType: entryType,
     );
 
     final localId = await _refuelRepository.saveRefuel(refuel);

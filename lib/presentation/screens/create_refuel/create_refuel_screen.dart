@@ -5,7 +5,6 @@ import 'package:fuelsense/presentation/screens/create_refuel/widgets/entry_type_
 import 'package:fuelsense/presentation/screens/create_refuel/widgets/fuel_amount_field.dart';
 import 'package:fuelsense/presentation/screens/create_refuel/widgets/fuel_price_per_liter_field.dart';
 import 'package:fuelsense/presentation/screens/create_refuel/widgets/fuel_total_cost_field.dart';
-import 'package:fuelsense/presentation/screens/create_refuel/widgets/incomplete_entry_warning.dart';
 import 'package:fuelsense/presentation/screens/create_refuel/widgets/odometer_field.dart';
 import 'package:fuelsense/presentation/screens/create_refuel/widgets/submit_button.dart';
 import 'package:fuelsense/presentation/screens/create_refuel/widgets/trip_meter_field.dart';
@@ -53,53 +52,45 @@ class _CreateRefuelScreenState extends ConsumerState<CreateRefuelScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Incomplete entry warning
-                    if (state.hasIncompleteEntry) ...[
-                      const IncompleteEntryWarning(),
-                      const SizedBox(height: 16),
-                    ],
-
                     // ── Entry type selection ──────────────────────────────
-                    if (!state.hasIncompleteEntry) ...[
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          EntryTypeCard(
-                            label: 'Reserve',
-                            icon: Icons.warning_amber_rounded,
-                            color: colorScheme.error,
-                            selected:
-                                state.refuelType == CreateRefuelType.reserveHit,
-                            onTap: () => notifier.updateRefuelType(
-                              CreateRefuelType.reserveHit,
-                            ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        EntryTypeCard(
+                          label: 'Reserve',
+                          icon: Icons.warning_amber_rounded,
+                          color: colorScheme.error,
+                          selected:
+                              state.refuelType == CreateRefuelType.reserveHit,
+                          disabled: state.hasIncompleteEntry,
+                          onTap: () => notifier.updateRefuelType(
+                            CreateRefuelType.reserveHit,
                           ),
-                          const SizedBox(width: 8),
-                          EntryTypeCard(
-                            label: 'Refuel',
-                            icon: Icons.local_gas_station_rounded,
-                            color: colorScheme.primary,
-                            selected:
-                                state.refuelType == CreateRefuelType.refuel,
-                            onTap: () => notifier.updateRefuelType(
-                              CreateRefuelType.refuel,
-                            ),
+                        ),
+                        const SizedBox(width: 8),
+                        EntryTypeCard(
+                          label: 'Refuel',
+                          icon: Icons.local_gas_station_rounded,
+                          color: colorScheme.primary,
+                          selected: state.refuelType == CreateRefuelType.refuel,
+                          disabled: state.hasIncompleteEntry,
+                          onTap: () => notifier.updateRefuelType(
+                            CreateRefuelType.refuel,
                           ),
-                          const SizedBox(width: 8),
-                          EntryTypeCard(
-                            label: 'Top-up',
-                            icon: Icons.add_circle_outline_rounded,
-                            color: colorScheme.tertiary,
-                            selected:
-                                state.refuelType == CreateRefuelType.topup,
-                            onTap: () => notifier.updateRefuelType(
-                              CreateRefuelType.topup,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                    ],
+                        ),
+                        const SizedBox(width: 8),
+                        EntryTypeCard(
+                          label: 'Top-up',
+                          icon: Icons.add_circle_outline_rounded,
+                          color: colorScheme.tertiary,
+                          selected: state.refuelType == CreateRefuelType.topup,
+                          disabled: state.hasIncompleteEntry,
+                          onTap: () =>
+                              notifier.updateRefuelType(CreateRefuelType.topup),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
 
                     // ── Meter Readings card ───────────────────────────────
                     _SectionCard(
@@ -109,10 +100,13 @@ class _CreateRefuelScreenState extends ConsumerState<CreateRefuelScreen> {
                         children: [
                           // info hint
                           _InfoBanner(
-                            text: isFirstEntry
+                            text: state.hasIncompleteEntry
+                                ? 'Readings from your reserve hit entry'
+                                : isFirstEntry
                                 ? 'First entry: both readings are required'
                                 : 'Enter at least one reading',
-                            isHighlighted: isFirstEntry,
+                            isHighlighted:
+                                isFirstEntry && !state.hasIncompleteEntry,
                           ),
                           const SizedBox(height: 12),
                           Row(

@@ -85,6 +85,21 @@ class _TripMeterFieldState extends ConsumerState<TripMeterField>
     final state = ref.watch(createRefuelNotifierProvider);
     final notifier = ref.read(createRefuelNotifierProvider.notifier);
 
+    // When disabled (pre-filled from incomplete entry), always sync controller
+    // from state — ref.listen alone misses state that was set before widget subscribed.
+    if (!widget.enabled && state.tripMeterReading != null) {
+      final formatted = state.tripMeterReading.toString();
+      if (_controller.text != formatted) _controller.text = formatted;
+    }
+
+    // Sync controller when pre-filled from incomplete entry (future changes)
+    ref.listen(createRefuelNotifierProvider, (prev, next) {
+      if (!widget.enabled && next.tripMeterReading != null) {
+        final formatted = next.tripMeterReading.toString();
+        if (_controller.text != formatted) _controller.text = formatted;
+      }
+    });
+
     return AnimatedBuilder(
       animation: _shakeAnimation,
       builder: (context, child) => Transform.translate(

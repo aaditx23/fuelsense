@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/domain/entities/refuel.dart';
 import 'package:fuelsense/presentation/screens/refuel_dashboard/refuel_dashboard_notifier.dart';
+import 'package:fuelsense/presentation/screens/refuel_list/widgets/refuel_entry_type_helper.dart';
 import 'package:fuelsense/presentation/utils/number_format_utils.dart';
 import 'package:intl/intl.dart';
 
@@ -166,36 +167,12 @@ class RecentRefuelsCard extends ConsumerWidget {
     );
   }
 
-  Color _getEntryTypeColor(RefuelEntryType type) {
-    switch (type) {
-      case RefuelEntryType.reserveIncomplete:
-        return Colors.orange;
-      case RefuelEntryType.reserveComplete:
-        return Colors.green;
-      case RefuelEntryType.topup:
-        return Colors.blue;
-    }
-  }
+  Color _getEntryTypeColor(RefuelEntryType type) =>
+      RefuelEntryTypeHelper.getEntryTypeColor(type);
 
-  IconData _getEntryTypeIcon(RefuelEntryType type) {
-    switch (type) {
-      case RefuelEntryType.reserveIncomplete:
-        return Icons.warning;
-      case RefuelEntryType.reserveComplete:
-        return Icons.local_gas_station;
-      case RefuelEntryType.topup:
-        return Icons.add;
-    }
-  }
+  IconData _getEntryTypeIcon(RefuelEntryType type) =>
+      RefuelEntryTypeHelper.getEntryTypeIcon(type);
 
-  String _getEntryTypeLabel(RefuelEntryType type) {
-    switch (type) {
-      case RefuelEntryType.reserveIncomplete:
-        return 'Reserve Hit';
-      case RefuelEntryType.reserveComplete:
-        return 'Refueled';
-      case RefuelEntryType.topup:
-        return 'Top-up';
-    }
-  }
+  String _getEntryTypeLabel(RefuelEntryType type) =>
+      RefuelEntryTypeHelper.getEntryTypeLabel(type);
 }
