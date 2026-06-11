@@ -9,12 +9,22 @@ class BikeResponse {
   final String message;
   final List<BikeModel>? data;
 
-  BikeResponse({
-    required this.success,
-    required this.message,
-    this.data,
-  });
+  BikeResponse({required this.success, required this.message, this.data});
 
-  factory BikeResponse.fromJson(Map<String, dynamic> json) => _$BikeResponseFromJson(json);
+  factory BikeResponse.fromJson(Map<String, dynamic> json) =>
+      _$BikeResponseFromJson(json);
   Map<String, dynamic> toJson() => _$BikeResponseToJson(this);
+}
+
+@JsonSerializable()
+class AddBikeResponse {
+  final bool success;
+  final String message;
+  final BikeModel? data;
+
+  AddBikeResponse({required this.success, required this.message, this.data});
+
+  factory AddBikeResponse.fromJson(Map<String, dynamic> json) =>
+      _$AddBikeResponseFromJson(json);
+  Map<String, dynamic> toJson() => _$AddBikeResponseToJson(this);
 }

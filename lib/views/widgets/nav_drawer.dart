@@ -56,6 +56,14 @@ class NavDrawer extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/my_bikes');
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.add_circle_outlined),
+            title: const Text('Add Bikes'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/add_bike');
+            },
+          ),
         ],
       ),
     );
