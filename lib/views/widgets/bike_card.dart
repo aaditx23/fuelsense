@@ -13,84 +13,58 @@ class BikeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image or placeholder
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: bike.image != null && bike.image!.isNotEmpty
-                  ? Image.memory(
-                base64Decode(bike.image!),
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-              )
-                  : Container(
-                width: 80,
-                height: 80,
-                color: Colors.grey[200],
-                child: const Icon(
-                    Icons.motorcycle, size: 40, color: Colors.grey),
-              ),
+    return Padding(
+      padding: const EdgeInsets.all(6.0),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(36.0),
+        ),
+        color: Theme.of(context).colorScheme.tertiaryContainer,
+        elevation: 0,
+        child: InkWell(
+          onTap: (){},
+          borderRadius: BorderRadius.circular(36.0),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 28.0,
+                  backgroundImage: (bike.image != null && bike.image!.isNotEmpty)
+                      ? MemoryImage(base64Decode(bike.image!))
+                      : AssetImage("assets/images/default_bike.png") ,
+                  backgroundColor: Theme.of(context).colorScheme.tertiaryContainer,
+                ),
+
+                const SizedBox(width: 12),
+                // Bike details
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("${bike.brand} ${bike.model} ${bike.modelYear}",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18.0
+                      ),
+                      maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+
+                      Text("${bike.engineCc} CC",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14.0
+                      ),)
+
+                    ],
+                  ),
+                ),
+                IconButton(onPressed: (){}, icon: Icon(Icons.add))
+              ],
             ),
-            const SizedBox(width: 16),
-            // Bike details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('${bike.brand} ${bike.model}', style: Theme
-                      .of(context)
-                      .textTheme
-                      .titleMedium),
-                  const SizedBox(height: 4),
-                  Text('Engine: ${bike.engineCc} cc', style: Theme
-                      .of(context)
-                      .textTheme
-                      .bodyMedium),
-                  Text('Year: ${bike.modelYear}', style: Theme
-                      .of(context)
-                      .textTheme
-                      .bodyMedium),
-                  Text('Fuel: ${bike.fuelType}', style: Theme
-                      .of(context)
-                      .textTheme
-                      .bodyMedium),
-                  Text('Mileage: ${bike.expectedMileage.toStringAsFixed(
-                      1)} km/l', style: Theme
-                      .of(context)
-                      .textTheme
-                      .bodyMedium),
-                  Text('Tank: ${bike.tankCapacity.toStringAsFixed(1)} L',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .bodyMedium),
-                  if (bike.reserveCapacity != null)
-                    Text('Reserve: ${bike.reserveCapacity!.toStringAsFixed(
-                        1)} L', style: Theme
-                        .of(context)
-                        .textTheme
-                        .bodyMedium),
-                  const SizedBox(height: 8),
-                  Text('Updated: ${bike.updatedAt}', style: Theme
-                      .of(context)
-                      .textTheme
-                      .bodySmall
-                      ?.copyWith(color: Colors.grey)),
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

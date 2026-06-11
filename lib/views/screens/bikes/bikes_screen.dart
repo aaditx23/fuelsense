@@ -29,8 +29,9 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
     return bikes.where((bike) {
       return bike.brand.toLowerCase().contains(query) ||
           bike.model.toLowerCase().contains(query) ||
-          bike.engineCc.toString().contains(query) ||
           bike.modelYear.toString().contains(query) ||
+          "${bike.brand} ${bike.model} ${bike.modelYear}".toLowerCase().contains(query) ||
+          bike.engineCc.toString().contains(query) ||
           bike.fuelType.toLowerCase().contains(query) ||
           bike.expectedMileage.toString().contains(query) ||
           bike.tankCapacity.toString().contains(query) ||

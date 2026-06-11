@@ -21,6 +21,8 @@ class CommonScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         title: title != null ? Text(title!) : null,
         actions: actions,
         centerTitle: true,
