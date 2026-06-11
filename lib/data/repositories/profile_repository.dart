@@ -28,7 +28,7 @@ class ProfileRepositoryImpl implements domain_profile.ProfileRepository {
     try {
       // Assume there's a /auth/me endpoint that returns user profile
       final response = await http.get(
-        Uri.parse("$baseUrl/auth/me/"),
+        Uri.parse("$baseUrl/user/profile/"),
         headers: authorizedHeader(token),
       );
 
