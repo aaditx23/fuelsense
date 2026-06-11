@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class ProfileImageWidget extends StatelessWidget {
@@ -17,7 +19,7 @@ class ProfileImageWidget extends StatelessWidget {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return CircleAvatar(
         radius: radius,
-        backgroundImage: NetworkImage(imageUrl!),
+        backgroundImage: MemoryImage(base64Decode(imageUrl!)),
       );
     } else {
       return CircleAvatar(

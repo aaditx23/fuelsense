@@ -24,17 +24,25 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _profileImageController = TextEditingController();
+
 
   String _selectedRole = "user";
   String? _profileImage;
+
+  @override
+  void initState(){
+    super.initState();
+    Future.microtask((){
+      ref.read(signupNotifier.notifier).reset();
+    });
+  }
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _profileImageController.dispose();
+    _profileImage = null;
     super.dispose();
   }
 
@@ -57,14 +65,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         username: _nameController.text.trim(),
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
-        profileImage: _profileImageController.text.trim().isEmpty ? null : _profileImageController.text.trim(),
+        profile_image: _profileImage?.trim(),
         role: _selectedRole,
       );
+      print("ISGNUP REQUEST: ${signupRequest.profile_image}");
       ref.read(signupNotifier.notifier).signup(signupRequest);
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Signup')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -96,8 +104,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       ),
                       const SizedBox(height: 24),
                       PickProfileImage(
-                        onClick: () async {
-                          _profileImage = await pickCropImage(ImageSource.gallery);
+                        onSet: (image) {
+                          _profileImage = image;
                         },
                       ),
                       const SizedBox(height: 12),
@@ -120,11 +128,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         validator: (value) => value == null || value.isEmpty ? 'Enter your password' : null,
                       ),
                       const SizedBox(height: 12),
-                      OutlinedTextField(
-                        controller: _profileImageController,
-                        labelText: 'Profile Image (optional)',
-                      ),
-                      const SizedBox(height: 12),
+
                       RoleDropdown(
                         value: _selectedRole,
                         onChanged: (val) {
@@ -161,8 +165,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             state.message!,
-                            style: const TextStyle(
-                              color: Colors.red,
+                            style: TextStyle(
+                              color: state.isSuccess
+                                  ? Colors.lightGreen
+                                  : Colors.red,
                               fontWeight: FontWeight.normal,
                               fontSize: 12,
                             ),

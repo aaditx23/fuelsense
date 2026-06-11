@@ -18,8 +18,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  bool _obscure = true;
-
   @override
   void dispose() {
     _emailController.dispose();
@@ -28,8 +26,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref.read(loginNotifier.notifier).resetState();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final LoginState state = ref.watch(loginNotifier);
+
 
     ref.listen(loginNotifier, (prev, next) {
       if (next.isSuccess) {
@@ -50,7 +57,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -114,7 +120,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         onPressed: () => onLogin(),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
+                          elevation: 0,
+                          backgroundColor: Theme.of(context).colorScheme.primaryContainer
                         ),
+
                         child: state.isLoading
                             ? const SizedBox(
                                 height: 18,

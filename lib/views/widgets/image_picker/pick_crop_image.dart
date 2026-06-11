@@ -14,8 +14,9 @@ Future<String?> pickCropImage(ImageSource source) async{
   final cropped = await ImageCropper().cropImage(
     sourcePath: pickedImage.path,
     compressFormat: ImageCompressFormat.jpg,
-    compressQuality: 100,
-
+    compressQuality: 80, // Lower quality for smaller size
+    maxWidth: 128, // Limit width
+    maxHeight: 128, // Limit height
     uiSettings: [
       AndroidUiSettings(
         toolbarTitle: "Crop Image",
@@ -44,4 +45,3 @@ Future<String?> pickCropImage(ImageSource source) async{
 
 
 }
-

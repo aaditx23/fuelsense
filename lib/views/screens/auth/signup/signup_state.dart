@@ -19,4 +19,8 @@ class SignupState {
       code: code ?? this.code,
     );
   }
+
+  SignupState empty(){
+    return SignupState(isLoading: false, isSuccess: false, message: null);
+  }
 }

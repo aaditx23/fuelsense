@@ -1,35 +1,46 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fuelsense/views/widgets/image_picker/pick_crop_image.dart';
+import 'package:image_picker/image_picker.dart';
 
 class PickProfileImage extends StatefulWidget {
   final double size;
-  final VoidCallback? onClick;
-  final String? image;
-  const PickProfileImage({Key? key, this.size = 80, this.onClick, this.image}) : super(key: key);
+  final void Function(String?) onSet;
+  const PickProfileImage({Key? key, this.size = 80, required this.onSet}) : super(key: key);
 
   @override
   State<PickProfileImage> createState() => _PickProfileImageState();
 }
 
 class _PickProfileImageState extends State<PickProfileImage> {
+  String? image;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onClick, // Use the provided onClick callback
+      onTap: () async {
+        image = await pickCropImage(ImageSource.gallery);
+        widget.onSet(image);
+        print(image);
+        setState(() {
+
+        });
+      }, // Use the provided onClick callback
       child: Stack(
         alignment: Alignment.center,
         children: [
           CircleAvatar(
             radius: widget.size / 2,
-            backgroundColor: Colors.grey.withAlpha((0.2 * 255).toInt()),
-            backgroundImage: AssetImage( widget.image ?? "assets/images/user_default.png"),
+            backgroundColor: Colors.grey.withAlpha((0.5 * 255).toInt()),
+            backgroundImage: (image != null)
+                ? MemoryImage(base64Decode(image!))
+                : const AssetImage('assets/images/user_default.png') as ImageProvider,
 
           ),
           Positioned(
-            bottom: 8,
-            right: 8,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Colors.white.withAlpha((0.5 * 255).toInt()),
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(

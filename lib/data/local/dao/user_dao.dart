@@ -10,7 +10,7 @@ abstract class UserDao {
   Future<UserEntity?> getUserById(int id);
 
   @insert
-  Future<void> createUser(UserEntity user);
+  Future<int> createUser(UserEntity user);
 
   @delete
   Future<void> deleteUser(UserEntity user);

@@ -19,4 +19,8 @@ class LoginState {
       code: code ?? this.code
     );
   }
+
+  LoginState empty(){
+   return LoginState(isLoading: false, isSuccess: false);
+  }
 }

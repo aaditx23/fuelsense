@@ -17,6 +17,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
   Future<void> loadProfile() async {
     state = state.copyWith(isLoading: true, message: null, user: null);
     final userId = prefs.getUserId();
+    print("USR ID: $userId");
     if (userId == null) {
       state = state.copyWith(isLoading: false, message: 'User not logged in');
       return;
