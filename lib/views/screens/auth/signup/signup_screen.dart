@@ -69,7 +69,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           profileImage: _profileImage?.trim(),
           role: _selectedRole,
         );
-        print("ISGNUP REQUEST: ${signupRequest.profileImage}");
         ref.read(signupNotifierProvider.notifier).signup(signupRequest);
       }
     }
@@ -138,17 +137,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             : null,
                       ),
                       const SizedBox(height: 12),
-
-                      DropdownWidget(
-                        items: roleType,
-                        onChanged: (value) {
-                          setState(() {
-                            _selectedRole = value ?? "user";
-                          });
-                        },
-                        labelText: "Role",
-                        prefixIcon: Icons.add_moderator_outlined,
-                      ),
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: state.isLoading ? null : () => onSignup(),

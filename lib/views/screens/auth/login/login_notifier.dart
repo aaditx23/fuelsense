@@ -5,7 +5,6 @@ import 'package:fuelsense/data/remote/auth/repository/auth_repository.dart';
 import 'package:fuelsense/data/remote/auth/schema/request.dart';
 import 'package:fuelsense/di/setup_di.dart';
 import 'package:fuelsense/views/screens/auth/login/login_state.dart';
-import 'package:http/http.dart';
 
 class LoginNotifier extends StateNotifier<LoginState> {
   final AuthRepository _authRepository;
@@ -34,6 +33,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
         final userId = await _userDao.createUser(user);
         prefs.saveUserId(userId);
+        prefs.saveRole(user.role);
         if (response.token != null) await prefs.saveToken(response.token!);
       }
       state = state.copyWith(

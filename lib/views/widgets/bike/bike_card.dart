@@ -1,19 +1,18 @@
 import 'dart:convert';
-import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:fuelsense/data/remote/bike/schema/bike_model.dart';
-import 'package:fuelsense/views/screens/bikes/widgets/bike_details.dart';
 
 class BikeCard extends StatelessWidget {
   final BikeModel bike;
-  final bool inMyBikes;
-  final Function onAction;
+  final Function onTap;
+  final Widget? trailingIcon;
 
   const BikeCard({
     super.key,
     required this.bike,
-    required this.inMyBikes,
-    required this.onAction,
+    required this.onTap,
+    this.trailingIcon,
   });
 
   @override
@@ -27,9 +26,7 @@ class BikeCard extends StatelessWidget {
         color: Theme.of(context).colorScheme.primaryContainer,
         elevation: 0,
         child: InkWell(
-          onTap: () {
-            bikeDetails(context, bike, inMyBikes, onAction);
-          },
+          onTap: () => onTap(),
           borderRadius: BorderRadius.circular(36.0),
           child: Padding(
             padding: const EdgeInsets.all(12.0),
@@ -70,12 +67,7 @@ class BikeCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () {
-                    onAction();
-                  },
-                  icon: Icon(inMyBikes ? Icons.remove : Icons.add),
-                ),
+                if (trailingIcon != null) trailingIcon!,
               ],
             ),
           ),

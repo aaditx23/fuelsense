@@ -1,11 +1,10 @@
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:fuelsense/data/local/dao/user_dao.dart';
 import 'package:fuelsense/data/local/shared_preferences/shared_preferences.dart';
 import 'package:fuelsense/data/remote/auth/repository/auth_repository.dart';
 import 'package:fuelsense/data/remote/auth/schema/request.dart';
 import 'package:fuelsense/di/setup_di.dart';
 import 'package:fuelsense/views/screens/auth/signup/signup_state.dart';
-
-import 'package:fuelsense/data/local/dao/user_dao.dart';
 
 class SignupNotifier extends StateNotifier<SignupState> {
   final AuthRepository _authRepository;
@@ -33,6 +32,7 @@ class SignupNotifier extends StateNotifier<SignupState> {
         final user = userResponse.toEntity(signupRequest.password);
         final userId = await _userDao.createUser(user);
         _prefs.saveUserId(userId);
+        _prefs.saveRole(user.role);
         if (response.token != null) await _prefs.saveToken(response.token!);
       }
       state = state.copyWith(

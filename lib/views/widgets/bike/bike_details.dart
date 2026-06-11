@@ -1,32 +1,27 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fuelsense/data/remote/bike/schema/bike_model.dart';
 
-class PendingBikeCard extends StatelessWidget {
-  final BikeModel bike;
-  final Function onAdd;
-
-  const PendingBikeCard({super.key, required this.bike, required this.onAdd});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 2,
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+Future<void> bikeDetails(
+  BuildContext context,
+  BikeModel bike,
+  List<Widget> actions,
+) async {
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: ClipRRect(
+          borderRadius: BorderRadiusGeometry.circular(36.0),
+          child: (bike.image != null)
+              ? Image.memory(base64Decode(bike.image!))
+              : Image.asset("assets/images/default_bike.png"),
+        ),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadiusGeometry.circular(36.0),
-              child: (bike.image != null)
-                  ? Image.memory(base64Decode(bike.image!))
-                  : Image.asset("assets/images/default_bike.png"),
-            ),
-            SizedBox(height: 12),
             Text.rich(
               TextSpan(
                 children: [
@@ -172,22 +167,10 @@ class PendingBikeCard extends StatelessWidget {
                 ],
               ),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushNamed(context, "/edit_bike", arguments: bike);
-                  },
-                  child: Text("Edit"),
-                ),
-                FilledButton(onPressed: () => onAdd(), child: Text("Confirm")),
-              ],
-            ),
           ],
         ),
-      ),
-    );
-  }
+        actions: actions,
+      );
+    },
+  );
 }

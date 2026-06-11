@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/data/remote/bike/schema/bike_model.dart';
 import 'package:fuelsense/views/screens/pending_bikes/pending_bikes_notifier.dart';
-import 'package:fuelsense/views/screens/pending_bikes/widgets/pending_bike_card.dart';
 import 'package:fuelsense/views/widgets/common_scaffold.dart';
 import 'package:fuelsense/views/widgets/response_text.dart';
 import 'package:fuelsense/views/widgets/search_bar_widget.dart';
+
+import '../../widgets/bike/bike_card.dart';
+import '../../widgets/bike/bike_details.dart';
 
 class PendingBikeScreen extends ConsumerStatefulWidget {
   const PendingBikeScreen({super.key});
@@ -84,7 +86,40 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
                     itemCount: filteredBikes.length,
                     itemBuilder: (context, index) {
                       final bike = filteredBikes[index];
-                      return PendingBikeCard(bike: bike, onAdd: () {});
+                      return BikeCard(
+                        bike: bike,
+                        trailingIcon: IconButton(
+                          onPressed: () {},
+                          icon: Icon(Icons.hourglass_bottom_rounded),
+                        ),
+                        onTap: () {
+                          bikeDetails(context, bike, [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("Close"),
+                            ),
+                            OutlinedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                Navigator.pushNamed(
+                                  context,
+                                  "/edit_bike",
+                                  arguments: bike,
+                                );
+                              },
+                              child: Text("Edit"),
+                            ),
+                            FilledButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("Add"),
+                            ),
+                          ]);
+                        },
+                      );
                     },
                   )
                 : Column(

@@ -3,11 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/data/remote/bike/schema/bike_model.dart';
 import 'package:fuelsense/data/remote/bike/schema/bike_request.dart';
 import 'package:fuelsense/views/screens/add_bike/add_bike_notifier.dart';
-import 'package:fuelsense/views/screens/add_bike/add_bike_state.dart';
 import 'package:fuelsense/views/screens/add_bike/add_bike_validators.dart';
 import 'package:fuelsense/views/screens/pending_bikes/pending_bikes_notifier.dart';
 import 'package:fuelsense/views/widgets/common_scaffold.dart';
-import 'package:fuelsense/views/widgets/dialog/message_dialog.dart';
 import 'package:fuelsense/views/widgets/dropdown_widget.dart';
 import 'package:fuelsense/views/widgets/image_picker/pick_image.dart';
 import 'package:fuelsense/views/widgets/outlined_text_field.dart';
@@ -24,10 +22,10 @@ class EditBikeScreen extends ConsumerStatefulWidget {
   const EditBikeScreen({super.key, required this.bike});
 
   @override
-  ConsumerState<EditBikeScreen> createState() => _AddBikeScreenState();
+  ConsumerState<EditBikeScreen> createState() => _EditBikeScreenState();
 }
 
-class _AddBikeScreenState extends ConsumerState<EditBikeScreen> {
+class _EditBikeScreenState extends ConsumerState<EditBikeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _isLoading = false;
 
@@ -83,7 +81,9 @@ class _AddBikeScreenState extends ConsumerState<EditBikeScreen> {
         tankCapacity: double.parse(_tankCapacityController.text.trim()),
         image: _selectedImage,
       );
-      await ref.read(pendingBikesNotifierProvider.notifier).editBike(widget.bike.id, bikeRequest);
+      await ref
+          .read(pendingBikesNotifierProvider.notifier)
+          .editBike(widget.bike.id, bikeRequest);
       if (mounted) {
         Navigator.pop(context);
       }
