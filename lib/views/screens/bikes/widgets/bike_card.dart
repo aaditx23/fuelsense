@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:fuelsense/data/remote/bike/schema/bike_model.dart';
+import 'package:fuelsense/views/screens/bikes/widgets/bike_details.dart';
 
 class BikeCard extends StatelessWidget {
   final BikeModel bike;
@@ -22,7 +23,9 @@ class BikeCard extends StatelessWidget {
         color: Theme.of(context).colorScheme.tertiaryContainer,
         elevation: 0,
         child: InkWell(
-          onTap: (){},
+          onTap: (){
+            bikeDetails(context, bike);
+          },
           borderRadius: BorderRadius.circular(36.0),
           child: Padding(
             padding: const EdgeInsets.all(12.0),

@@ -41,7 +41,7 @@ class NavDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.person),
+            leading: const Icon(Icons.motorcycle),
             title: const Text('Bikes'),
             onTap: () {
               Navigator.pop(context);

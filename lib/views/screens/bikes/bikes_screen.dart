@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/data/remote/bike/schema/bike_model.dart';
-import 'package:fuelsense/views/widgets/bike_card.dart';
+import 'package:fuelsense/views/screens/bikes/widgets/bike_card.dart';
 import 'package:fuelsense/views/widgets/common_scaffold.dart';
 import 'package:fuelsense/views/widgets/search_bar_widget.dart';
 import 'bike_notifier.dart';
