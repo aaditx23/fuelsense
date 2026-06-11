@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: "/screen01",
+      initialRoute: "/login",
       routes: getRoute(context),
       title: 'fuelsense',
       debugShowCheckedModeBanner: false,

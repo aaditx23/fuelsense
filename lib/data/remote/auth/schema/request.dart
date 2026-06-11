@@ -2,9 +2,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'request.g.dart';
 
-/*
--d 'grant_type=password&username=user%40fuelsense.com&password=user123&scope=&client_id=&client_secret='
-*/
 @JsonSerializable()
 class LoginRequest {
   String username;
@@ -17,18 +14,23 @@ class LoginRequest {
   }
 }
 
+@JsonSerializable()
 class SignupRequest {
-  String name;
+  String username;
   String email;
   String password;
   String? profileImage;
   String role = "user";
 
   SignupRequest({
-    required this.name,
+    required this.username,
     required this.email,
     required this.password,
     this.profileImage,
     required this.role,
   });
+
+  Map<String, dynamic> toJson(){
+    return _$SignupRequestToJson(this);
+  }
 }

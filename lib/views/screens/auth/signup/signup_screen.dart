@@ -1,37 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/data/remote/auth/schema/request.dart';
-import 'package:fuelsense/views/screens/auth/login/login_notifier.dart';
-import 'package:fuelsense/views/screens/auth/login/login_state.dart';
+import 'package:fuelsense/views/screens/auth/signup/signup_notifier.dart';
+import 'package:fuelsense/views/screens/auth/signup/signup_state.dart';
 import 'package:fuelsense/views/widgets/password_field.dart';
-import 'package:fuelsense/views/widgets/outlined_text_field.dart';
+import 'package:fuelsense/views/widgets/role_dropdown.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+import '../../../widgets/outlined_text_field.dart';
+
+
+class SignupScreen extends ConsumerStatefulWidget {
+  const SignupScreen({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends ConsumerState<LoginScreen> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _profileImageController = TextEditingController();
 
-  bool _obscure = true;
+  String _selectedRole = "user";
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _profileImageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final LoginState state = ref.watch(loginNotifier);
+    final SignupState state = ref.watch(signupNotifier);
 
-    ref.listen(loginNotifier, (prev, next) {
+    ref.listen(signupNotifier, (prev, next) {
       if (next.isSuccess) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -41,16 +48,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     });
 
-    void onLogin() {
-      final loginRequest = LoginRequest(
-        username: _emailController.text.trim(),
+    void onSignup() {
+      final signupRequest = SignupRequest(
+        username: _nameController.text.trim(),
+        email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
+        profileImage: _profileImageController.text.trim().isEmpty ? null : _profileImageController.text.trim(),
+        role: _selectedRole,
       );
-      ref.read(loginNotifier.notifier).login(loginRequest);
+      ref.read(signupNotifier.notifier).signup(signupRequest);
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text('Signup')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -73,7 +83,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       const FlutterLogo(size: 72),
                       const SizedBox(height: 16),
                       const Text(
-                        'Welcome back',
+                        'Create your account',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 20,
@@ -82,36 +92,46 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       const SizedBox(height: 24),
                       OutlinedTextField(
+                        controller: _nameController,
+                        labelText: 'Name',
+                        validator: (value) => value == null || value.isEmpty ? 'Enter your name' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedTextField(
                         controller: _emailController,
                         labelText: 'Email',
                         keyboardType: TextInputType.emailAddress,
-                        prefixIcon: const Icon(Icons.email),
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) return 'Enter email';
-                          if (!v.contains('@')) return 'Enter a valid email';
-                          return null;
-                        },
+                        validator: (value) => value == null || value.isEmpty ? 'Enter your Email' : null,
                       ),
                       const SizedBox(height: 12),
                       PasswordField(
                         controller: _passwordController,
                         labelText: 'Password',
-                        validator: (v) {
-                          if (v == null || v.isEmpty) return 'Enter password';
-                          return null;
+                        validator: (value) => value == null || value.isEmpty ? 'Enter your password' : null,
+                      ),
+                      const SizedBox(height: 12),
+                      OutlinedTextField(
+                        controller: _profileImageController,
+                        labelText: 'Profile Image (optional)',
+                      ),
+                      const SizedBox(height: 12),
+                      RoleDropdown(
+                        value: _selectedRole,
+                        onChanged: (val) {
+                          setState(() {
+                            _selectedRole = val ?? "user";
+                          });
                         },
                       ),
-                      const SizedBox(height: 8),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () {},
-                          child: const Text('Forgot password?'),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 24),
                       ElevatedButton(
-                        onPressed: () => onLogin(),
+                        onPressed: state.isLoading
+                            ? null
+                            : () {
+                                if (_formKey.currentState?.validate() ?? false) {
+                                  onSignup();
+                                }
+                              },
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
@@ -123,7 +143,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Login'),
+                            : const Text('Signup'),
                       ),
                       const SizedBox(height: 12),
                       if (state.message != null && !state.isLoading)
@@ -131,10 +151,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             state.message!,
-                            style: TextStyle(
-                              color: state.isSuccess
-                                  ? Colors.lightGreen
-                                  : Colors.red,
+                            style: const TextStyle(
+                              color: Colors.red,
                               fontWeight: FontWeight.normal,
                               fontSize: 12,
                             ),
@@ -144,12 +162,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text("Don't have an account?"),
+                          const Text("Already have an account?"),
                           TextButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, "/signup");
+                              Navigator.pop(context);
                             },
-                            child: const Text('Sign up'),
+                            child: const Text('Login'),
                           ),
                         ],
                       ),
