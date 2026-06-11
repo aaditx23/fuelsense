@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fuelsense/views/screens/auth/login/login_screen.dart';
 import 'package:fuelsense/views/screens/auth/signup/signup_screen.dart';
+import 'package:fuelsense/views/screens/my_bikes/my_bikes_screen.dart';
 import 'package:fuelsense/views/screens/profile/profile_screen.dart';
 import 'package:fuelsense/views/screens/screen01/screen01.dart';
 import 'package:fuelsense/views/screens/screen02/screen02.dart';
@@ -16,7 +17,8 @@ Map<String, WidgetBuilder> getRoute(context) {
     "/screen02": (context) => Screen02(),
     "/login": (context) => LoginScreen(),
     "/signup": (context) => SignupScreen(),
-    "/bikes": (context) => BikesScreen()
+    "/bikes": (context) => BikesScreen(),
+    "/my_bikes": (context) => MyBikesScreen()
   };
 }
 

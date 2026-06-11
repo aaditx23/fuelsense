@@ -22,8 +22,9 @@
  */
 
 import 'package:floor/floor.dart';
+import 'package:flutter/cupertino.dart';
 
-@Entity(tableName: "bikes")
+@Entity(tableName: "bikes", indices: [Index(value: ["id"], unique: true)])
 class BikeEntity {
   @PrimaryKey(autoGenerate: true)
   int? localId;

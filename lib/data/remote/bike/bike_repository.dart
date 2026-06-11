@@ -26,9 +26,7 @@ class BikeRepository {
       body: jsonEncode({"bikeId": bikeId})
     );
 
-    print(response.body.isEmpty);
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    print(jsonResponse);
     final bikeResponse = BikeResponse.fromJson(jsonResponse);
     return bikeResponse;
   }
