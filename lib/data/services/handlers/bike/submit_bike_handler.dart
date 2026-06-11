@@ -54,7 +54,7 @@ class SubmitBikeHandler implements OperationHandler {
       '[SubmitBikeHandler] API Response - Success: ${response.success}, Message: ${response.message} ID: ${response.data!.id}',
     );
 
-    if (response.success) {
+    if (response.success && response.data != null) {
       print(
         '[SubmitBikeHandler] Updating local entity with remoteId: ${response.data!.id}',
       );

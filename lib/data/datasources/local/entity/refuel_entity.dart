@@ -1,13 +1,4 @@
-import 'package:floor/floor.dart';
-
-@Entity(
-  tableName: "fuel_records",
-  indices: [
-    Index(value: ['remoteId'], unique: true),
-  ],
-)
 class RefuelEntity {
-  @PrimaryKey(autoGenerate: true)
   int? localId;
   int remoteId;
   int userId;
@@ -19,11 +10,7 @@ class RefuelEntity {
   double? fuelLiter;
   double? fuelPrice;
   int createdAt; // timestamp in milliseconds
-
-  // Entry type: 'RESERVE_INCOMPLETE', 'RESERVE_COMPLETE', 'TOPUP'
-  String entryType;
-
-  // Links entries in the same reserve cycle
+  String entryType; // 'RESERVE_INCOMPLETE', 'RESERVE_COMPLETE', 'TOPUP'
   int? reserveCycleId;
 
   RefuelEntity({
@@ -41,6 +28,54 @@ class RefuelEntity {
     required this.entryType,
     this.reserveCycleId,
   });
+
+  factory RefuelEntity.fromJson(Map<String, dynamic> json, [int? localKey]) {
+    return RefuelEntity(
+      localId: localKey ?? json['localId'] as int?,
+      remoteId: json['remoteId'] as int,
+      userId: json['userId'] as int,
+      userBikeId: json['userBikeId'] as int,
+      odometerReading: json['odometerReading'] != null 
+          ? (json['odometerReading'] as num).toDouble() 
+          : null,
+      tripMeterReading: json['tripMeterReading'] != null 
+          ? (json['tripMeterReading'] as num).toDouble() 
+          : null,
+      tripMeterAtReserve: json['tripMeterAtReserve'] != null 
+          ? (json['tripMeterAtReserve'] as num).toDouble() 
+          : null,
+      odometerAtReserve: json['odometerAtReserve'] != null 
+          ? (json['odometerAtReserve'] as num).toDouble() 
+          : null,
+      fuelLiter: json['fuelLiter'] != null 
+          ? (json['fuelLiter'] as num).toDouble() 
+          : null,
+      fuelPrice: json['fuelPrice'] != null 
+          ? (json['fuelPrice'] as num).toDouble() 
+          : null,
+      createdAt: json['createdAt'] as int,
+      entryType: json['entryType'] as String,
+      reserveCycleId: json['reserveCycleId'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'localId': localId,
+      'remoteId': remoteId,
+      'userId': userId,
+      'userBikeId': userBikeId,
+      'odometerReading': odometerReading,
+      'tripMeterReading': tripMeterReading,
+      'tripMeterAtReserve': tripMeterAtReserve,
+      'odometerAtReserve': odometerAtReserve,
+      'fuelLiter': fuelLiter,
+      'fuelPrice': fuelPrice,
+      'createdAt': createdAt,
+      'entryType': entryType,
+      'reserveCycleId': reserveCycleId,
+    };
+  }
 
   RefuelEntity copyWith({
     int? localId,

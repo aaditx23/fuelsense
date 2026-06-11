@@ -1,4 +1,4 @@
-package com.aaditx23.fuelsense
+package com.example.fuelsense
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -3,6 +3,7 @@ import 'package:fuelsense/data/datasources/local/entity/bike_entity.dart';
 import 'package:fuelsense/data/datasources/remote/bike/bike_api_service.dart';
 import 'package:fuelsense/data/mappers/bike_mapper.dart';
 import 'package:fuelsense/data/models/base_response.dart';
+import 'package:fuelsense/data/models/bike/bike_model.dart' as data_bike;
 import 'package:fuelsense/domain/entities/bike/add_bike_response.dart';
 import 'package:fuelsense/domain/entities/bike/bike.dart';
 import 'package:fuelsense/domain/entities/bike/bike_request.dart';
@@ -10,8 +11,7 @@ import 'package:fuelsense/domain/entities/bike/bike_response.dart';
 import 'package:fuelsense/data/datasources/local/dao/bike_dao.dart';
 import 'package:fuelsense/data/services/sync_manager.dart';
 import 'package:fuelsense/data/datasources/local/entity/pending_operation_entity.dart';
-
-import '../../domain/repositories/bike_repository.dart';
+import 'package:fuelsense/domain/repositories/bike_repository.dart';
 
 class BikeRepositoryImpl implements BikeRepository {
   final BikeDao bikeDao;
@@ -65,8 +65,6 @@ class BikeRepositoryImpl implements BikeRepository {
 
       await _upsertBikes(entities, preserveFlags: true);
     } catch (e) {
-      // If sync fails, we don't throw - let the caller handle it
-      // The offline-first approach means we should still show local data
       print('Failed to sync all bikes: ${e.toString()}');
       rethrow;
     }
@@ -92,8 +90,6 @@ class BikeRepositoryImpl implements BikeRepository {
 
       await _upsertBikes(entities);
     } catch (e) {
-      // If sync fails, we don't throw - let the caller handle it
-      // The offline-first approach means we should still show local data
       print('Failed to sync my bikes: ${e.toString()}');
       rethrow;
     }
@@ -122,8 +118,6 @@ class BikeRepositoryImpl implements BikeRepository {
 
       await _upsertBikes(entities);
     } catch (e) {
-      // If sync fails, we don't throw - let the caller handle it
-      // The offline-first approach means we should still show local data
       print('Failed to sync pending bikes: ${e.toString()}');
       rethrow;
     }
@@ -260,9 +254,6 @@ class BikeRepositoryImpl implements BikeRepository {
     await syncManager.enqueueOperation(operation);
 
     // Return success immediately with the local entity
-    final domainBike = BikeMapper.toDomainBikeFromEntity(
-      localEntity.copyWith(localId: localId),
-    );
     return AddBikeResponse(
       success: true,
       message: 'Bike submitted successfully',
@@ -310,7 +301,27 @@ class BikeRepositoryImpl implements BikeRepository {
       success: true,
       message: 'Bike updated successfully',
       data: existing != null
-          ? BikeMapper.toDomainBikeFromEntity(existing)
+          ? BikeMapper.toDomainBike(
+              data_bike.BikeModel(
+                id: existing.remoteId,
+                brand: existing.brand,
+                model: existing.model,
+                engineCc: existing.engineCc,
+                modelYear: existing.modelYear,
+                fuelType: existing.fuelType,
+                expectedMileage: existing.expectedMileage,
+                tankCapacity: existing.tankCapacity,
+                reserveCapacity: existing.reserveCapacity,
+                image: existing.image,
+                submittedBy: existing.submittedBy,
+                adminNote: existing.adminNote,
+                isActive: existing.isActive,
+                createdAt: existing.createdAt,
+                updatedAt: existing.updatedAt,
+                isMine: existing.isMine,
+                isPending: existing.isPending,
+              ),
+            )
           : null,
     );
   }
@@ -358,7 +369,27 @@ class BikeRepositoryImpl implements BikeRepository {
       success: true,
       message: 'Bike approved successfully',
       data: existing != null
-          ? BikeMapper.toDomainBikeFromEntity(existing)
+          ? BikeMapper.toDomainBike(
+              data_bike.BikeModel(
+                id: existing.remoteId,
+                brand: existing.brand,
+                model: existing.model,
+                engineCc: existing.engineCc,
+                modelYear: existing.modelYear,
+                fuelType: existing.fuelType,
+                expectedMileage: existing.expectedMileage,
+                tankCapacity: existing.tankCapacity,
+                reserveCapacity: existing.reserveCapacity,
+                image: existing.image,
+                submittedBy: existing.submittedBy,
+                adminNote: existing.adminNote,
+                isActive: existing.isActive,
+                createdAt: existing.createdAt,
+                updatedAt: existing.updatedAt,
+                isMine: existing.isMine,
+                isPending: existing.isPending,
+              ),
+            )
           : null,
     );
   }

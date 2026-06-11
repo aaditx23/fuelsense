@@ -1,15 +1,5 @@
-import 'package:floor/floor.dart';
-
-@Entity(
-  tableName: "users",
-  indices: [
-    Index(value: ['remote_id'], unique: true),
-  ],
-)
 class UserEntity {
-  @PrimaryKey(autoGenerate: true)
   int? localId;
-  @ColumnInfo(name: 'remote_id')
   int remoteId;
   String username;
   String email;
@@ -26,6 +16,30 @@ class UserEntity {
     required this.role,
     this.profileImage,
   });
+
+  factory UserEntity.fromJson(Map<String, dynamic> json, [int? localKey]) {
+    return UserEntity(
+      localId: localKey ?? json['localId'] as int?,
+      remoteId: json['remoteId'] as int,
+      username: json['username'] as String,
+      email: json['email'] as String,
+      password: json['password'] as String,
+      role: json['role'] as String,
+      profileImage: json['profileImage'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'localId': localId,
+      'remoteId': remoteId,
+      'username': username,
+      'email': email,
+      'password': password,
+      'role': role,
+      'profileImage': profileImage,
+    };
+  }
 
   UserEntity copyWith({
     int? localId,

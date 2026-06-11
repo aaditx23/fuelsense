@@ -1,33 +1,14 @@
-import 'package:floor/floor.dart';
-
-@Entity(
-  tableName: "reserve_cycles",
-  indices: [
-    Index(value: ['userBikeId', 'cycleStartDate']),
-  ],
-)
 class ReserveCycleEntity {
-  @PrimaryKey(autoGenerate: true)
   int? id;
-
   int userBikeId;
-
-  // Cycle boundaries
   int cycleStartDate;
   int? cycleEndDate; // null = current/ongoing cycle
-
-  // Distance traveled in this cycle
   double? startTripReading;
   double? endTripReading; // at reserve
   double? startOdometerReading;
   double? endOdometerReading; // at reserve
-
-  // Fuel consumption
   double totalFuelAdded; // Sum of all refuels in cycle
-
-  // Calculated metrics
   double? calculatedMileage; // null until cycle completes
-
   bool isComplete; // false until reserve hits
 
   ReserveCycleEntity({
@@ -43,6 +24,48 @@ class ReserveCycleEntity {
     this.calculatedMileage,
     this.isComplete = false,
   });
+
+  factory ReserveCycleEntity.fromJson(Map<String, dynamic> json, [int? localKey]) {
+    return ReserveCycleEntity(
+      id: localKey ?? json['id'] as int?,
+      userBikeId: json['userBikeId'] as int,
+      cycleStartDate: json['cycleStartDate'] as int,
+      cycleEndDate: json['cycleEndDate'] as int?,
+      startTripReading: json['startTripReading'] != null 
+          ? (json['startTripReading'] as num).toDouble() 
+          : null,
+      endTripReading: json['endTripReading'] != null 
+          ? (json['endTripReading'] as num).toDouble() 
+          : null,
+      startOdometerReading: json['startOdometerReading'] != null 
+          ? (json['startOdometerReading'] as num).toDouble() 
+          : null,
+      endOdometerReading: json['endOdometerReading'] != null 
+          ? (json['endOdometerReading'] as num).toDouble() 
+          : null,
+      totalFuelAdded: (json['totalFuelAdded'] as num).toDouble(),
+      calculatedMileage: json['calculatedMileage'] != null 
+          ? (json['calculatedMileage'] as num).toDouble() 
+          : null,
+      isComplete: json['isComplete'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userBikeId': userBikeId,
+      'cycleStartDate': cycleStartDate,
+      'cycleEndDate': cycleEndDate,
+      'startTripReading': startTripReading,
+      'endTripReading': endTripReading,
+      'startOdometerReading': startOdometerReading,
+      'endOdometerReading': endOdometerReading,
+      'totalFuelAdded': totalFuelAdded,
+      'calculatedMileage': calculatedMileage,
+      'isComplete': isComplete,
+    };
+  }
 
   ReserveCycleEntity copyWith({
     int? id,

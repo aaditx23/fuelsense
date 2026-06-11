@@ -1,3 +1,11 @@
+import 'package:dio/dio.dart';
+import 'package:fuelsense/data/datasources/remote/dio_client.dart';
+import 'package:fuelsense/data/datasources/local/dao/user_dao.dart';
+import 'package:fuelsense/data/datasources/local/dao/bike_dao.dart';
+import 'package:fuelsense/data/datasources/local/dao/refuel_dao.dart';
+import 'package:fuelsense/data/datasources/local/dao/reserve_cycle_dao.dart';
+import 'package:fuelsense/data/datasources/local/dao/pending_operation_dao.dart';
+import 'package:fuelsense/data/datasources/local/shared_preferences/shared_preferences.dart';
 import 'package:fuelsense/data/datasources/remote/auth/auth_api_service.dart';
 import 'package:fuelsense/data/datasources/remote/bike/bike_api_service.dart';
 import 'package:fuelsense/data/repositories/auth_repository_impl.dart';
@@ -42,57 +50,90 @@ import 'package:fuelsense/data/services/handlers/bike/approve_bike_handler.dart'
 import 'package:fuelsense/di/setup_di.dart';
 
 void setupRepositories() {
+  // Register Dio network client
+  getIt.registerLazySingleton<Dio>(() => buildDioClient());
+
   // Register API services
-  getIt.registerLazySingleton<AuthApiService>(() => AuthApiService());
-  getIt.registerLazySingleton<BikeApiService>(() => BikeApiService());
+  getIt.registerLazySingleton<AuthApiService>(() => AuthApiService(getIt<Dio>()));
+  getIt.registerLazySingleton<BikeApiService>(() => BikeApiService(getIt<Dio>()));
 
   // Register services
   getIt.registerLazySingleton<ConnectivityService>(() => ConnectivityService());
   getIt.registerLazySingleton<SyncManager>(
-    () => SyncManager(getIt(), getIt(), getIt()),
+    () => SyncManager(
+      getIt<PendingOperationDao>(),
+      getIt<ConnectivityService>(),
+      getIt<AppSharedPreferences>(),
+    ),
   );
 
   // Register operation handlers
-  getIt.registerLazySingleton(() => SelectBikeHandler(getIt(), getIt()));
-  getIt.registerLazySingleton(() => RemoveBikeHandler(getIt(), getIt()));
   getIt.registerLazySingleton(
-    () => SubmitBikeHandler(getIt(), getIt(), getIt()),
+    () => SelectBikeHandler(getIt<BikeApiService>(), getIt<AppSharedPreferences>()),
   );
-  getIt.registerLazySingleton(() => EditBikeHandler(getIt(), getIt(), getIt()));
-  getIt.registerLazySingleton(() => DeleteBikeHandler(getIt(), getIt()));
-  getIt.registerLazySingleton(() => ApproveBikeHandler(getIt(), getIt()));
+  getIt.registerLazySingleton(
+    () => RemoveBikeHandler(getIt<BikeApiService>(), getIt<AppSharedPreferences>()),
+  );
+  getIt.registerLazySingleton(
+    () => SubmitBikeHandler(
+      getIt<BikeApiService>(),
+      getIt<BikeDao>(),
+      getIt<AppSharedPreferences>(),
+    ),
+  );
+  getIt.registerLazySingleton(
+    () => EditBikeHandler(
+      getIt<BikeApiService>(),
+      getIt<BikeDao>(),
+      getIt<AppSharedPreferences>(),
+    ),
+  );
+  getIt.registerLazySingleton(
+    () => DeleteBikeHandler(getIt<BikeApiService>(), getIt<AppSharedPreferences>()),
+  );
+  getIt.registerLazySingleton(
+    () => ApproveBikeHandler(getIt<BikeApiService>(), getIt<AppSharedPreferences>()),
+  );
 
   // Register concrete implementations under their abstraction types
   getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(getIt()),
+    () => AuthRepositoryImpl(getIt<AuthApiService>()),
   );
   getIt.registerLazySingleton<BikeRepository>(
-    () => BikeRepositoryImpl(getIt(), getIt(), getIt()),
+    () => BikeRepositoryImpl(
+      getIt<BikeDao>(),
+      getIt<BikeApiService>(),
+      getIt<SyncManager>(),
+    ),
   );
   getIt.registerLazySingleton<PreferencesRepository>(
-    () => PreferencesRepositoryImpl(getIt()),
+    () => PreferencesRepositoryImpl(getIt<AppSharedPreferences>()),
   );
   getIt.registerLazySingleton<domain_profile.ProfileRepository>(
-    () => data_profile.ProfileRepositoryImpl(getIt()),
+    () => data_profile.ProfileRepositoryImpl(
+      getIt<UserDao>(),
+      getIt<Dio>(),
+    ),
   );
   getIt.registerLazySingleton<RefuelRepository>(
-    () => RefuelRepositoryImpl(getIt()),
+    () => RefuelRepositoryImpl(getIt<RefuelDao>()),
   );
   getIt.registerLazySingleton<ReserveCycleRepository>(
-    () => ReserveCycleRepositoryImpl(getIt()),
+    () => ReserveCycleRepositoryImpl(getIt<ReserveCycleDao>()),
   );
 
+  // Use cases
   getIt.registerLazySingleton(
     () => LoginUseCase(
       getIt<AuthRepository>(),
-      getIt(),
+      getIt<UserDao>(),
       getIt<PreferencesRepository>(),
     ),
   );
   getIt.registerLazySingleton(
     () => SignupUseCase(
       getIt<AuthRepository>(),
-      getIt(),
+      getIt<UserDao>(),
       getIt<PreferencesRepository>(),
     ),
   );

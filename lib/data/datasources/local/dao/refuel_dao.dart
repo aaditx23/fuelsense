@@ -1,65 +1,147 @@
-import 'package:floor/floor.dart';
+import 'package:hive/hive.dart';
 import 'package:fuelsense/data/datasources/local/entity/refuel_entity.dart';
 
-@dao
-abstract class RefuelDao {
-  @Query(
-    'SELECT * FROM fuel_records WHERE userBikeId = :userBikeId ORDER BY createdAt DESC',
-  )
-  Future<List<RefuelEntity>> findAllByUserBikeId(int userBikeId);
+class RefuelDao {
+  final Box _box;
 
-  @Query(
-    'SELECT * FROM fuel_records WHERE userBikeId = :userBikeId ORDER BY createdAt DESC',
-  )
-  Stream<List<RefuelEntity>> watchAllByUserBikeId(int userBikeId);
+  RefuelDao(this._box);
 
-  @Query('SELECT * FROM fuel_records WHERE remoteId = :remoteId')
-  Future<RefuelEntity?> findByRemoteId(int remoteId);
+  Future<int> insertRefuel(RefuelEntity refuel) async {
+    final key = await _box.add(refuel.toJson());
+    refuel.localId = key;
+    await _box.put(key, refuel.toJson());
+    return key;
+  }
 
-  @Query('SELECT * FROM fuel_records WHERE localId = :localId')
-  Future<RefuelEntity?> findByLocalId(int localId);
+  Future<int> updateRefuel(RefuelEntity refuel) async {
+    if (refuel.localId != null) {
+      await _box.put(refuel.localId, refuel.toJson());
+      return 1;
+    }
+    return 0;
+  }
 
-  @Query(
-    'SELECT * FROM fuel_records WHERE userBikeId = :userBikeId AND entryType = :entryType ORDER BY createdAt DESC',
-  )
+  Future<int> deleteRefuel(RefuelEntity refuel) async {
+    if (refuel.localId != null) {
+      await _box.delete(refuel.localId);
+      return 1;
+    }
+    return 0;
+  }
+
+  Future<int?> deleteByRemoteId(int remoteId) async {
+    final entity = await findByRemoteId(remoteId);
+    if (entity != null && entity.localId != null) {
+      await _box.delete(entity.localId);
+      return 1;
+    }
+    return 0;
+  }
+
+  Future<List<RefuelEntity>> findAllByUserBikeId(int userBikeId) async {
+    final list = <RefuelEntity>[];
+    for (final key in _box.keys) {
+      final value = _box.get(key);
+      if (value != null) {
+        final map = Map<String, dynamic>.from(value as Map);
+        if (map['userBikeId'] == userBikeId) {
+          list.add(RefuelEntity.fromJson(map, key as int));
+        }
+      }
+    }
+    return list..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  Stream<List<RefuelEntity>> watchAllByUserBikeId(int userBikeId) {
+    return _box.watch().map((_) {
+      final list = <RefuelEntity>[];
+      for (final key in _box.keys) {
+        final value = _box.get(key);
+        if (value != null) {
+          final map = Map<String, dynamic>.from(value as Map);
+          if (map['userBikeId'] == userBikeId) {
+            list.add(RefuelEntity.fromJson(map, key as int));
+          }
+        }
+      }
+      return list..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    });
+  }
+
+  Future<RefuelEntity?> findByRemoteId(int remoteId) async {
+    for (final key in _box.keys) {
+      final value = _box.get(key);
+      if (value != null) {
+        final map = Map<String, dynamic>.from(value as Map);
+        if (map['remoteId'] == remoteId) {
+          return RefuelEntity.fromJson(map, key as int);
+        }
+      }
+    }
+    return null;
+  }
+
+  Future<RefuelEntity?> findByLocalId(int localId) async {
+    final value = _box.get(localId);
+    if (value == null) return null;
+    return RefuelEntity.fromJson(Map<String, dynamic>.from(value as Map), localId);
+  }
+
   Future<List<RefuelEntity>> findByUserBikeIdAndEntryType(
     int userBikeId,
     String entryType,
-  );
+  ) async {
+    final list = await findAllByUserBikeId(userBikeId);
+    return list.where((r) => r.entryType == entryType).toList();
+  }
 
-  @Query(
-    'SELECT * FROM fuel_records WHERE userBikeId = :userBikeId AND entryType = "RESERVE_INCOMPLETE" ORDER BY createdAt DESC LIMIT 1',
-  )
-  Future<RefuelEntity?> findIncompleteReserveEntry(int userBikeId);
+  Future<RefuelEntity?> findIncompleteReserveEntry(int userBikeId) async {
+    final list = await findAllByUserBikeId(userBikeId);
+    for (final refuel in list) {
+      if (refuel.entryType == 'RESERVE_INCOMPLETE') {
+        return refuel;
+      }
+    }
+    return null;
+  }
 
-  @Query(
-    'SELECT * FROM fuel_records WHERE reserveCycleId = :cycleId ORDER BY createdAt ASC',
-  )
-  Future<List<RefuelEntity>> findByReserveCycleId(int cycleId);
+  Future<List<RefuelEntity>> findByReserveCycleId(int cycleId) async {
+    final list = <RefuelEntity>[];
+    for (final key in _box.keys) {
+      final value = _box.get(key);
+      if (value != null) {
+        final map = Map<String, dynamic>.from(value as Map);
+        if (map['reserveCycleId'] == cycleId) {
+          list.add(RefuelEntity.fromJson(map, key as int));
+        }
+      }
+    }
+    return list..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+  }
 
-  @insert
-  Future<int> insertRefuel(RefuelEntity refuel);
-
-  @update
-  Future<int> updateRefuel(RefuelEntity refuel);
-
-  @delete
-  Future<int> deleteRefuel(RefuelEntity refuel);
-
-  @Query('DELETE FROM fuel_records WHERE remoteId = :remoteId')
-  Future<int?> deleteByRemoteId(int remoteId);
-
-  @Query(
-    'UPDATE fuel_records SET entryType = :entryType, reserveCycleId = :cycleId WHERE localId = :localId',
-  )
   Future<int?> updateEntryTypeAndCycle(
     int localId,
     String entryType,
     int cycleId,
-  );
+  ) async {
+    final refuel = await findByLocalId(localId);
+    if (refuel != null) {
+      refuel.entryType = entryType;
+      refuel.reserveCycleId = cycleId;
+      await _box.put(localId, refuel.toJson());
+      return 1;
+    }
+    return 0;
+  }
 
-  @Query(
-    'UPDATE fuel_records SET entryType = :entryType, reserveCycleId = NULL WHERE localId = :localId',
-  )
-  Future<int?> updateEntryTypeAndClearCycle(int localId, String entryType);
+  Future<int?> updateEntryTypeAndClearCycle(int localId, String entryType) async {
+    final refuel = await findByLocalId(localId);
+    if (refuel != null) {
+      refuel.entryType = entryType;
+      refuel.reserveCycleId = null;
+      await _box.put(localId, refuel.toJson());
+      return 1;
+    }
+    return 0;
+  }
 }

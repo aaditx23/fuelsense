@@ -1,49 +1,120 @@
-import 'package:floor/floor.dart';
-import '../entity/bike_entity.dart';
+import 'package:hive/hive.dart';
+import 'package:fuelsense/data/datasources/local/entity/bike_entity.dart';
 
-@dao
-abstract class BikeDao {
-  @Insert(onConflict: OnConflictStrategy.replace)
-  Future<int> insertBike(BikeEntity bike);
+class BikeDao {
+  final Box _box;
 
-  @Insert(onConflict: OnConflictStrategy.replace)
-  Future<void> insertBikes(List<BikeEntity> bikes);
+  BikeDao(this._box);
 
-  @Query('SELECT * FROM bikes')
-  Future<List<BikeEntity>> getAllBikes();
+  Future<int> insertBike(BikeEntity bike) async {
+    final key = await _box.add(bike.toJson());
+    bike.localId = key;
+    await _box.put(key, bike.toJson());
+    return key;
+  }
 
-  @Query('SELECT * FROM bikes WHERE isMine = 1')
-  Future<List<BikeEntity>> getMyBikes();
+  Future<void> insertBikes(List<BikeEntity> bikes) async {
+    for (final bike in bikes) {
+      final existing = await getBikeByRemoteId(bike.remoteId);
+      if (existing != null) {
+        bike.localId = existing.localId;
+        await _box.put(existing.localId, bike.toJson());
+      } else {
+        await insertBike(bike);
+      }
+    }
+  }
 
-  @Query('SELECT * FROM bikes WHERE isPending = 1')
-  Future<List<BikeEntity>> getPendingBikes();
+  Future<List<BikeEntity>> getAllBikes() async {
+    return _box.keys.map((key) {
+      final value = _box.get(key);
+      return BikeEntity.fromJson(Map<String, dynamic>.from(value as Map), key as int);
+    }).toList();
+  }
 
-  @Query('SELECT * FROM bikes WHERE isPending = 0')
-  Future<List<BikeEntity>> getAllAvailableBikes();
+  Future<List<BikeEntity>> getMyBikes() async {
+    final bikes = await getAllBikes();
+    return bikes.where((b) => b.isMine).toList();
+  }
 
-  @Query('SELECT * FROM bikes WHERE localId = :localId')
-  Future<BikeEntity?> getBikeByLocalId(int localId);
+  Future<List<BikeEntity>> getPendingBikes() async {
+    final bikes = await getAllBikes();
+    return bikes.where((b) => b.isPending).toList();
+  }
 
-  @Query('SELECT * FROM bikes WHERE remoteId = :remoteId')
-  Future<BikeEntity?> getBikeByRemoteId(int remoteId);
+  Future<List<BikeEntity>> getAllAvailableBikes() async {
+    final bikes = await getAllBikes();
+    return bikes.where((b) => !b.isPending).toList();
+  }
 
-  @Query('DELETE FROM bikes WHERE remoteId = :remoteId')
-  Future<void> deleteBikeByRemoteId(int remoteId);
+  Future<BikeEntity?> getBikeByLocalId(int localId) async {
+    final value = _box.get(localId);
+    if (value == null) return null;
+    return BikeEntity.fromJson(Map<String, dynamic>.from(value as Map), localId);
+  }
 
-  @Query('DELETE FROM bikes')
-  Future<void> deleteAllBikes();
+  Future<BikeEntity?> getBikeByRemoteId(int remoteId) async {
+    for (final key in _box.keys) {
+      final value = _box.get(key);
+      if (value != null) {
+        final map = Map<String, dynamic>.from(value as Map);
+        if (map['remoteId'] == remoteId) {
+          return BikeEntity.fromJson(map, key as int);
+        }
+      }
+    }
+    return null;
+  }
 
-  @update
-  Future<int> updateBike(BikeEntity bike);
+  Future<void> deleteBikeByRemoteId(int remoteId) async {
+    final bike = await getBikeByRemoteId(remoteId);
+    if (bike != null && bike.localId != null) {
+      await _box.delete(bike.localId);
+    }
+  }
 
-  // --- Reactive (Stream) queries — equivalent to Room Flow<List<X>> ---
+  Future<void> deleteAllBikes() async {
+    await _box.clear();
+  }
 
-  @Query('SELECT * FROM bikes WHERE isPending = 0')
-  Stream<List<BikeEntity>> watchAllAvailableBikes();
+  Future<int> updateBike(BikeEntity bike) async {
+    if (bike.localId != null) {
+      await _box.put(bike.localId, bike.toJson());
+      return 1;
+    }
+    final existing = await getBikeByRemoteId(bike.remoteId);
+    if (existing != null && existing.localId != null) {
+      bike.localId = existing.localId;
+      await _box.put(existing.localId, bike.toJson());
+      return 1;
+    }
+    return 0;
+  }
 
-  @Query('SELECT * FROM bikes WHERE isMine = 1')
-  Stream<List<BikeEntity>> watchMyBikes();
+  Stream<List<BikeEntity>> watchAllAvailableBikes() {
+    return _box.watch().map((_) {
+      return _box.keys.map((key) {
+        final value = _box.get(key);
+        return BikeEntity.fromJson(Map<String, dynamic>.from(value as Map), key as int);
+      }).where((b) => !b.isPending).toList();
+    });
+  }
 
-  @Query('SELECT * FROM bikes WHERE isPending = 1')
-  Stream<List<BikeEntity>> watchPendingBikes();
+  Stream<List<BikeEntity>> watchMyBikes() {
+    return _box.watch().map((_) {
+      return _box.keys.map((key) {
+        final value = _box.get(key);
+        return BikeEntity.fromJson(Map<String, dynamic>.from(value as Map), key as int);
+      }).where((b) => b.isMine).toList();
+    });
+  }
+
+  Stream<List<BikeEntity>> watchPendingBikes() {
+    return _box.watch().map((_) {
+      return _box.keys.map((key) {
+        final value = _box.get(key);
+        return BikeEntity.fromJson(Map<String, dynamic>.from(value as Map), key as int);
+      }).where((b) => b.isPending).toList();
+    });
+  }
 }

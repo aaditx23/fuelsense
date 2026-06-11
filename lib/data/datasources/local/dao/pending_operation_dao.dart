@@ -1,42 +1,80 @@
-import 'package:floor/floor.dart';
-import '../entity/pending_operation_entity.dart';
+import 'package:hive/hive.dart';
+import 'package:fuelsense/data/datasources/local/entity/pending_operation_entity.dart';
 
-@dao
-abstract class PendingOperationDao {
-  @Insert()
-  Future<int> insertOperation(PendingOperationEntity operation);
+class PendingOperationDao {
+  final Box _box;
 
-  @Insert()
-  Future<void> insertOperations(List<PendingOperationEntity> operations);
+  PendingOperationDao(this._box);
 
-  @Query('SELECT * FROM pending_operations ORDER BY createdAt ASC')
-  Future<List<PendingOperationEntity>> getAllPendingOperations();
+  Future<int> insertOperation(PendingOperationEntity operation) async {
+    final key = await _box.add(operation.toJson());
+    // Assign local key to operation if needed, but since operation is final in its fields, 
+    // we make a copy with local id to save
+    final savedOp = operation.copyWith(id: key);
+    await _box.put(key, savedOp.toJson());
+    return key;
+  }
 
-  @Query('SELECT * FROM pending_operations WHERE id = :id')
-  Future<PendingOperationEntity?> getOperationById(int id);
+  Future<void> insertOperations(List<PendingOperationEntity> operations) async {
+    for (final op in operations) {
+      await insertOperation(op);
+    }
+  }
 
-  @delete
-  Future<int> deleteOperation(PendingOperationEntity operation);
+  Future<List<PendingOperationEntity>> getAllPendingOperations() async {
+    final list = _box.keys.map((key) {
+      final value = _box.get(key);
+      return PendingOperationEntity.fromJson(Map<String, dynamic>.from(value as Map), key as int);
+    }).toList();
+    return list..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+  }
 
-  @Query('DELETE FROM pending_operations WHERE id = :id')
-  Future<void> deleteOperationById(int id);
+  Future<PendingOperationEntity?> getOperationById(int id) async {
+    final value = _box.get(id);
+    if (value == null) return null;
+    return PendingOperationEntity.fromJson(Map<String, dynamic>.from(value as Map), id);
+  }
 
-  @Query('DELETE FROM pending_operations')
-  Future<void> deleteAllOperations();
+  Future<int> deleteOperation(PendingOperationEntity operation) async {
+    if (operation.id != null) {
+      await _box.delete(operation.id);
+      return 1;
+    }
+    return 0;
+  }
 
-  @update
-  Future<int> updateOperation(PendingOperationEntity operation);
+  Future<void> deleteOperationById(int id) async {
+    await _box.delete(id);
+  }
 
-  @Query('SELECT COUNT(*) FROM pending_operations')
-  Future<int?> getPendingOperationsCount();
+  Future<void> deleteAllOperations() async {
+    await _box.clear();
+  }
 
-  @Query(
-    'SELECT COUNT(*) FROM pending_operations WHERE entityType = :entityType',
-  )
-  Future<int?> getPendingOperationsCountByEntityType(String entityType);
+  Future<int> updateOperation(PendingOperationEntity operation) async {
+    if (operation.id != null) {
+      await _box.put(operation.id, operation.toJson());
+      return 1;
+    }
+    return 0;
+  }
 
-  // --- Reactive (Stream) query ---
+  Future<int?> getPendingOperationsCount() async {
+    return _box.length;
+  }
 
-  @Query('SELECT * FROM pending_operations ORDER BY createdAt ASC')
-  Stream<List<PendingOperationEntity>> watchAllPendingOperations();
+  Future<int?> getPendingOperationsCountByEntityType(String entityType) async {
+    final list = await getAllPendingOperations();
+    return list.where((op) => op.entityType == entityType).length;
+  }
+
+  Stream<List<PendingOperationEntity>> watchAllPendingOperations() {
+    return _box.watch().map((_) {
+      final list = _box.keys.map((key) {
+        final value = _box.get(key);
+        return PendingOperationEntity.fromJson(Map<String, dynamic>.from(value as Map), key as int);
+      }).toList();
+      return list..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+    });
+  }
 }
