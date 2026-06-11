@@ -160,6 +160,17 @@ class CreateRefuelNotifier extends StateNotifier<CreateRefuelState> {
     );
   }
 
+  /// Called by OdometerField when the value is auto-calculated from trip meter.
+  /// Only updates state if the user has not manually entered an odometer value.
+  void updateCalculatedOdometer(double? value) {
+    // Don't overwrite a manually entered odometer
+    if (value == null) {
+      state = state.copyWith(clearOdometer: true);
+    } else {
+      state = state.copyWith(odometerReading: value);
+    }
+  }
+
   void updateFuelLiter(double? value) {
     state = state.copyWith(fuelLiter: value, clearFuelLiter: value == null);
   }
@@ -248,22 +259,48 @@ final createRefuelNotifierProvider =
       );
     });
 
+/// Holds the last recorded odometer and trip meter from the same entry.
+class LastMeterReadings {
+  final double? odometer;
+  final double? tripMeter;
+  const LastMeterReadings({this.odometer, this.tripMeter});
+}
+
 // Provider to get the last odometer reading for validation
 final lastOdometerReadingProvider = FutureProvider.autoDispose
     .family<double?, int>((ref, userBikeId) async {
+      final readings = await ref.watch(
+        lastMeterReadingsProvider(userBikeId).future,
+      );
+      return readings.odometer;
+    });
+
+// Provider to get the last trip meter reading for odometer auto-calculation
+final lastTripMeterReadingProvider = FutureProvider.autoDispose
+    .family<double?, int>((ref, userBikeId) async {
+      final readings = await ref.watch(
+        lastMeterReadingsProvider(userBikeId).future,
+      );
+      return readings.tripMeter;
+    });
+
+// Single source of truth — both readings come from the same entry so
+// the odometer delta calculation is never misaligned.
+final lastMeterReadingsProvider = FutureProvider.autoDispose
+    .family<LastMeterReadings, int>((ref, userBikeId) async {
       final repository = getIt<RefuelRepository>();
       final refuels = await repository.getRefuelsByBikeId(userBikeId);
 
-      // Find the most recent entry with an odometer reading
       for (final refuel in refuels) {
-        if (refuel.odometerReading != null) {
-          return refuel.odometerReading;
-        }
-        if (refuel.odometerAtReserve != null) {
-          return refuel.odometerAtReserve;
+        // Pick the appropriate trip and odo fields based on entry type
+        final trip = refuel.tripMeterReading ?? refuel.tripMeterAtReserve;
+        final odo = refuel.odometerReading ?? refuel.odometerAtReserve;
+        // Only use an entry that has at least an odometer reading
+        if (odo != null) {
+          return LastMeterReadings(odometer: odo, tripMeter: trip);
         }
       }
-      return null;
+      return const LastMeterReadings();
     });
 
 // Provider to check if this is the first refuel entry
