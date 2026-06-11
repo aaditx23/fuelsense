@@ -21,6 +21,16 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
   @override
   void initState() {
     super.initState();
+    Future.microtask(() => _loadBikes());
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    Future.microtask(() => _loadBikes());
+  }
+
+  Future<void> _loadBikes() async {
     Future.microtask(
       () => ref.read(pendingBikesNotifierProvider.notifier).pendingBikes(),
     );

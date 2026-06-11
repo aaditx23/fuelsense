@@ -69,6 +69,23 @@ class BikeRepository {
     return bikeResponse;
   }
 
+  Future<AddBikeResponse> editBike(
+    String token,
+    BikeRequest bikeRequest,
+    int id,
+  ) async {
+    final json = bikeRequest.toJson();
+    final response = await http.put(
+      Uri.parse("$baseUrl/admin/bikes/$id/edit/"),
+      headers: authorizedHeader(token),
+      body: jsonEncode(json),
+    );
+    print(response.body.toString());
+    final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+    final bikeResponse = AddBikeResponse.fromJson(jsonResponse);
+    return bikeResponse;
+  }
+
   Future<BikeResponse> getPendingBikes(String token) async {
     final response = await http.get(
       (Uri.parse("$baseUrl/admin/bikes/pending/")),

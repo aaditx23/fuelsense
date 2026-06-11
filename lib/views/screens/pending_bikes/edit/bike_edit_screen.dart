@@ -83,7 +83,7 @@ class _AddBikeScreenState extends ConsumerState<EditBikeScreen> {
         tankCapacity: double.parse(_tankCapacityController.text.trim()),
         image: _selectedImage,
       );
-      // await ref.read(pendingBikesNotifierProvider.notifier).submitBike(bikeRequest);
+      await ref.read(pendingBikesNotifierProvider.notifier).editBike(widget.bike.id, bikeRequest);
       if (mounted) {
         Navigator.pop(context);
       }

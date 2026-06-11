@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/legacy.dart';
 import 'package:fuelsense/data/local/dao/bike_dao.dart';
 import 'package:fuelsense/data/local/shared_preferences/shared_preferences.dart';
 import 'package:fuelsense/data/remote/bike/bike_repository.dart';
+import 'package:fuelsense/data/remote/bike/schema/bike_request.dart';
 import 'package:fuelsense/di/setup_di.dart';
 import 'package:fuelsense/views/screens/pending_bikes/pending_bike_state.dart';
 
@@ -41,6 +42,30 @@ class PendingBikesNotifier extends StateNotifier<PendingBikeState> {
         isSuccess: false,
         message: e.toString(),
         pendingBikes: [],
+      );
+    }
+  }
+
+  Future<void> editBike(int id, BikeRequest bikeRequest) async {
+    final token = prefs.getToken();
+    if (token == null) return;
+    state = state.copyWith(
+      isLoading: true,
+      isSuccess: false,
+      message: null,
+    );
+    try {
+      final response = await bikeRepository.editBike(token, bikeRequest, id);
+      state = state.copyWith(
+        isLoading: false,
+        isSuccess: response.success,
+        message: response.message,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        isSuccess: false,
+        message: e.toString(),
       );
     }
   }
