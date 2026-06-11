@@ -30,6 +30,7 @@ class SignupNotifier extends StateNotifier<SignupState> {
       final userResponse = response.data;
       if (userResponse != null) {
         final user = userResponse.toEntity(signupRequest.password);
+        await _userDao.deleteAll();
         final userId = await _userDao.createUser(user);
         _prefs.saveUserId(userId);
         _prefs.saveRole(user.role);

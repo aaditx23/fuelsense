@@ -31,6 +31,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
       if (userResponse != null) {
         final user = userResponse.toEntity(loginRequest.password);
 
+        await _userDao.deleteAll();
         final userId = await _userDao.createUser(user);
         prefs.saveUserId(userId);
         prefs.saveRole(user.role);
