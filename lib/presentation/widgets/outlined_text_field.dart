@@ -16,6 +16,8 @@ class OutlinedTextField extends StatelessWidget {
   final bool obscureText;
   final ValueChanged<String>? onChanged;
   final List<TextInputFormatter>? inputFormatters;
+  final TextStyle? labelStyle;
+  final TextStyle? hintStyle;
 
   const OutlinedTextField({
     Key? key,
@@ -33,6 +35,8 @@ class OutlinedTextField extends StatelessWidget {
     this.obscureText = false,
     this.onChanged,
     this.inputFormatters,
+    this.labelStyle,
+    this.hintStyle,
   }) : assert(
          controller == null || initialValue == null,
          'controller and initialValue cannot both be set',
@@ -51,6 +55,8 @@ class OutlinedTextField extends StatelessWidget {
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
+        labelStyle: labelStyle,
+        hintStyle: hintStyle,
       ),
       validator: validator,
       keyboardType: keyboardType,

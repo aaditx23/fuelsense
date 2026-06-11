@@ -1,9 +1,9 @@
-import 'package:flutter_riverpod/legacy.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart' show FutureProvider;
-import 'package:fuelsense/domain/entities/refuel.dart';
-import 'package:fuelsense/domain/usecases/refuel_usecases.dart';
-import 'package:fuelsense/domain/repositories/refuel_repository.dart';
+import 'package:flutter_riverpod/legacy.dart';
 import 'package:fuelsense/di/setup_di.dart';
+import 'package:fuelsense/domain/entities/refuel.dart';
+import 'package:fuelsense/domain/repositories/refuel_repository.dart';
+import 'package:fuelsense/domain/usecases/refuel_usecases.dart';
 
 enum CreateRefuelType { reserveHit, refuel, topup }
 
@@ -18,7 +18,8 @@ class CreateRefuelState {
   final double? tripMeterReading;
   final double? odometerReading;
   final double? fuelLiter;
-  final double? fuelPrice;
+  final double? fuelPrice; // total cost
+  final double? fuelPricePerLiter; // price per liter (mandatory)
 
   CreateRefuelState({
     this.isLoading = false,
@@ -30,6 +31,7 @@ class CreateRefuelState {
     this.odometerReading,
     this.fuelLiter,
     this.fuelPrice,
+    this.fuelPricePerLiter,
   });
 
   CreateRefuelState copyWith({
@@ -42,11 +44,13 @@ class CreateRefuelState {
     double? odometerReading,
     double? fuelLiter,
     double? fuelPrice,
+    double? fuelPricePerLiter,
     bool clearIncomplete = false,
     bool clearTripMeter = false,
     bool clearOdometer = false,
     bool clearFuelLiter = false,
     bool clearFuelPrice = false,
+    bool clearFuelPricePerLiter = false,
   }) {
     return CreateRefuelState(
       isLoading: isLoading ?? this.isLoading,
@@ -64,17 +68,21 @@ class CreateRefuelState {
           : (odometerReading ?? this.odometerReading),
       fuelLiter: clearFuelLiter ? null : (fuelLiter ?? this.fuelLiter),
       fuelPrice: clearFuelPrice ? null : (fuelPrice ?? this.fuelPrice),
+      fuelPricePerLiter: clearFuelPricePerLiter
+          ? null
+          : (fuelPricePerLiter ?? this.fuelPricePerLiter),
     );
   }
 
   bool get hasIncompleteEntry => incompleteEntry != null;
 
+  bool get _hasFuelAmount => (fuelLiter ?? 0.0) > 0 || (fuelPrice ?? 0.0) > 0;
+
   bool get isFormValid {
     if (hasIncompleteEntry) {
-      // Must complete the incomplete entry
       return (tripMeterReading != null || odometerReading != null) &&
-          fuelLiter != null &&
-          fuelPrice != null;
+          fuelPricePerLiter != null &&
+          _hasFuelAmount;
     }
 
     switch (refuelType) {
@@ -82,12 +90,12 @@ class CreateRefuelState {
         return tripMeterReading != null || odometerReading != null;
       case CreateRefuelType.refuel:
         return (tripMeterReading != null || odometerReading != null) &&
-            fuelLiter != null &&
-            fuelPrice != null;
+            fuelPricePerLiter != null &&
+            _hasFuelAmount;
       case CreateRefuelType.topup:
         return (tripMeterReading != null || odometerReading != null) &&
-            fuelLiter != null &&
-            fuelPrice != null;
+            fuelPricePerLiter != null &&
+            _hasFuelAmount;
     }
   }
 }
@@ -158,6 +166,13 @@ class CreateRefuelNotifier extends StateNotifier<CreateRefuelState> {
 
   void updateFuelPrice(double? value) {
     state = state.copyWith(fuelPrice: value, clearFuelPrice: value == null);
+  }
+
+  void updateFuelPricePerLiter(double? value) {
+    state = state.copyWith(
+      fuelPricePerLiter: value,
+      clearFuelPricePerLiter: value == null,
+    );
   }
 
   Future<bool> submitEntry(int userId, int userBikeId) async {

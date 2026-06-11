@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/presentation/screens/create_refuel/create_refuel_notifier.dart';
-import 'package:fuelsense/presentation/screens/create_refuel/widgets/trip_meter_field.dart';
-import 'package:fuelsense/presentation/screens/create_refuel/widgets/odometer_field.dart';
 import 'package:fuelsense/presentation/screens/create_refuel/widgets/fuel_amount_field.dart';
 import 'package:fuelsense/presentation/screens/create_refuel/widgets/fuel_price_per_liter_field.dart';
 import 'package:fuelsense/presentation/screens/create_refuel/widgets/fuel_total_cost_field.dart';
+import 'package:fuelsense/presentation/screens/create_refuel/widgets/odometer_field.dart';
+import 'package:fuelsense/presentation/screens/create_refuel/widgets/trip_meter_field.dart';
 
 class RefuelTab extends ConsumerStatefulWidget {
   const RefuelTab({Key? key}) : super(key: key);
@@ -18,7 +18,6 @@ class _RefuelTabState extends ConsumerState<RefuelTab> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(createRefuelNotifierProvider);
-    final notifier = ref.read(createRefuelNotifierProvider.notifier);
     final colorScheme = Theme.of(context).colorScheme;
     final isFirstEntryAsync = ref.watch(isFirstRefuelEntryProvider(1));
 
@@ -129,7 +128,7 @@ class _RefuelTabState extends ConsumerState<RefuelTab> {
         ),
         const SizedBox(height: 16),
 
-        // Card 2: Fuel Details (Liters + Price per Liter)
+        // Card 2: Fuel Details
         Card(
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -155,54 +154,11 @@ class _RefuelTabState extends ConsumerState<RefuelTab> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const FuelAmountField(),
-                const SizedBox(height: 16),
-                FuelPricePerLiterField(
-                  isRequired: state.fuelLiter != null,
-                  onPricePerLiterChanged: (pricePerLiter) {
-                    // Auto-calculate total if both liters and per-liter price are available
-                    if (pricePerLiter != null && state.fuelLiter != null) {
-                      final total = state.fuelLiter! * pricePerLiter;
-                      ref
-                          .read(createRefuelNotifierProvider.notifier)
-                          .updateFuelPrice(total);
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        // Card 3: Total Cost (Direct Input)
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.receipt_long,
-                      size: 20,
-                      color: colorScheme.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Total Cost',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
+                // Price per liter — full width, mandatory
+                const FuelPricePerLiterField(),
                 const SizedBox(height: 12),
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: colorScheme.surfaceContainerHighest,
                     borderRadius: BorderRadius.circular(8),
@@ -211,13 +167,13 @@ class _RefuelTabState extends ConsumerState<RefuelTab> {
                     children: [
                       Icon(
                         Icons.info_outline,
-                        size: 18,
+                        size: 16,
                         color: colorScheme.onSurfaceVariant,
                       ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          'Enter total cost directly if you don\'t know liters or per-liter price',
+                          'Enter either fuel amount or total cost — the other will be calculated automatically.',
                           style: TextStyle(
                             fontSize: 12,
                             color: colorScheme.onSurfaceVariant,
@@ -228,7 +184,15 @@ class _RefuelTabState extends ConsumerState<RefuelTab> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const FuelTotalCostField(),
+                // Fuel amount + Total cost side by side
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Expanded(child: FuelAmountField()),
+                    SizedBox(width: 12),
+                    Expanded(child: FuelTotalCostField()),
+                  ],
+                ),
               ],
             ),
           ),
