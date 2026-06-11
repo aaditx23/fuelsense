@@ -31,10 +31,11 @@ class _Screen01State extends ConsumerState<Screen01> {
 
   @override
   Widget build(BuildContext context) {
-    final namesList = ref.watch(screen01Provider);
+    final state = ref.watch(screen01Provider);
 
     void saveText() {
       ref.read(screen01Provider.notifier).insertName(_inputController.text);
+      _inputController.clear();
     }
 
     return Scaffold(
@@ -81,9 +82,9 @@ class _Screen01State extends ConsumerState<Screen01> {
           Text("Floor Databse"),
           Expanded(
             child: ListView.builder(
-              itemCount: namesList.length,
+              itemCount: state.namesList.length,
               itemBuilder: (context, index) {
-                final name = namesList[index];
+                final name = state.namesList[index];
                 final id = name.id ?? 0;
                 return Padding(
                   padding: const EdgeInsets.only(
