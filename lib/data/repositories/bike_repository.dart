@@ -94,6 +94,7 @@ class BikeRepositoryImpl implements BikeRepository {
     );
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
     final bikeResponse = BikeResponse.fromJson(jsonResponse);
+    print("BIKE RESPONSE: ${bikeResponse.listData![0].reserveCapacity}");
     return bikeResponse;
   }
 

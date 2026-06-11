@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/data/models/bike/bike_request.dart';
 import 'package:fuelsense/presentation/screens/add_bike/add_bike_notifier.dart';
-import 'package:fuelsense/presentation/screens/add_bike/add_bike_state.dart';
 import 'package:fuelsense/presentation/screens/add_bike/add_bike_validators.dart';
 import 'package:fuelsense/presentation/widgets/common_scaffold.dart';
 import 'package:fuelsense/presentation/widgets/dialog/message_dialog.dart';
@@ -63,6 +62,7 @@ class _AddBikeScreenState extends ConsumerState<AddBikeScreen> {
         expectedMileage: double.parse(_expectedMileageController.text.trim()),
         tankCapacity: double.parse(_tankCapacityController.text.trim()),
         image: _selectedImage,
+        reserveCapacity: double.parse(_reserveCapacityController.text)
       );
       await ref.read(addBikeNotifierProvider.notifier).submitBike(bikeRequest);
       if (mounted) {
