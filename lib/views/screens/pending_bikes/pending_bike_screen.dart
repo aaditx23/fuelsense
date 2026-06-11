@@ -94,31 +94,55 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
                         ),
                         onTap: () {
                           bikeDetails(context, bike, [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text("Close"),
-                            ),
-                            OutlinedButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                Navigator.pushNamed(
-                                  context,
-                                  "/edit_bike",
-                                  arguments: bike,
-                                );
-                              },
-                              child: Text("Edit"),
-                            ),
-                            FilledButton(
-                              onPressed: () {
-                                ref
-                                    .read(pendingBikesNotifierProvider.notifier)
-                                    .approveBike(bike.id);
-                                Navigator.of(context).pop();
-                              },
-                              child: Text("Add"),
+                            Row(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Expanded(
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      icon: Icon(Icons.arrow_back_ios),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    Navigator.pushNamed(
+                                      context,
+                                      "/edit_bike",
+                                      arguments: bike,
+                                    );
+                                  },
+                                  icon: Icon(Icons.edit),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    ref
+                                        .read(
+                                          pendingBikesNotifierProvider.notifier,
+                                        )
+                                        .deleteBike(bike.id);
+                                  },
+                                  icon: Icon(Icons.delete),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    ref
+                                        .read(
+                                          pendingBikesNotifierProvider.notifier,
+                                        )
+                                        .approveBike(bike.id);
+                                    Navigator.of(context).pop();
+                                  },
+                                  icon: Icon(Icons.approval_rounded),
+                                ),
+                              ],
                             ),
                           ]);
                         },

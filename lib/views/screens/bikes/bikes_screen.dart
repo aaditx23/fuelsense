@@ -98,39 +98,68 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
                         ),
                         onTap: () {
                           bikeDetails(context, bike, [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text("Close"),
-                            ),
-                            if (ref
-                                .read(bikeNotifierProvider.notifier)
-                                .isAdmin())
-                              OutlinedButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                  Navigator.pushNamed(
-                                    context,
-                                    "/edit_bike",
-                                    arguments: bike,
-                                  );
-                                },
-                                child: Text("Edit"),
-                              ),
-                            FilledButton(
-                              onPressed: () {
-                                inMyBikes
-                                    ? ref
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Expanded(
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: IconButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      icon: Icon(Icons.arrow_back_ios),
+                                    ),
+                                  ),
+                                ),
+                                if (ref
+                                    .read(bikeNotifierProvider.notifier)
+                                    .isAdmin()) ...[
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      Navigator.pushNamed(
+                                        context,
+                                        "/edit_bike",
+                                        arguments: bike,
+                                      );
+                                    },
+                                    icon: Icon(Icons.edit),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      ref
                                           .read(bikeNotifierProvider.notifier)
-                                          .removeBike(bike.id)
-                                    : ref
-                                          .read(bikeNotifierProvider.notifier)
-                                          .selectBike(bike.id);
+                                          .deleteBike(bike.id);
+                                    },
+                                    icon: Icon(Icons.delete),
+                                  ),
+                                ],
+                                IconButton(
+                                  onPressed: () {
+                                    inMyBikes
+                                        ? ref
+                                              .read(
+                                                bikeNotifierProvider.notifier,
+                                              )
+                                              .removeBike(bike.id)
+                                        : ref
+                                              .read(
+                                                bikeNotifierProvider.notifier,
+                                              )
+                                              .selectBike(bike.id);
 
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(inMyBikes ? "Remove" : "Add"),
+                                    Navigator.of(context).pop();
+                                  },
+                                  icon: Icon(
+                                    inMyBikes
+                                        ? Icons.remove_circle
+                                        : Icons.add_circle,
+                                  ),
+                                ),
+                              ],
                             ),
                           ]);
                         },

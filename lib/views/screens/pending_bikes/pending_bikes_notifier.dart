@@ -88,6 +88,30 @@ class PendingBikesNotifier extends StateNotifier<PendingBikeState> {
       );
     }
   }
+
+  Future<void> deleteBike(int bikeId) async {
+    final token = prefs.getToken();
+    if (token == null) return;
+    state = state.copyWith(isLoading: true, message: null);
+    try {
+      final response = await bikeRepository.deleteBike(token, bikeId);
+      state = state.copyWith(
+        isLoading: false,
+        pendingBikes: state.pendingBikes
+            .where((bike) => bike.id != bikeId)
+            .toList(),
+        isSuccess: response.success,
+        message: response.message,
+      );
+    } catch (e) {
+      print(e.toString());
+      state = state.copyWith(
+        isLoading: false,
+        isSuccess: false,
+        message: e.toString(),
+      );
+    }
+  }
 }
 
 final pendingBikesNotifierProvider =

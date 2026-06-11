@@ -107,4 +107,17 @@ class BikeRepository {
     final bikeResponse = AddBikeResponse.fromJson(jsonResponse);
     return bikeResponse;
   }
+
+  Future<AddBikeResponse> deleteBike(String token, int bikeId) async {
+    final response = await http.delete(
+      Uri.parse("$baseUrl/admin/bikes/$bikeId/"),
+      headers: authorizedHeader(token),
+    );
+
+    print(response.body.toString());
+    final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+    jsonResponse["data"] = null;
+    final bikeResponse = AddBikeResponse.fromJson(jsonResponse);
+    return bikeResponse;
+  }
 }
