@@ -57,7 +57,7 @@ class _AddBikeScreenState extends ConsumerState<AddBikeScreen> {
         fuelType: _selectedFuelType,
         expectedMileage: double.parse(_expectedMileageController.text.trim()),
         tankCapacity: double.parse(_tankCapacityController.text.trim()),
-        image: null,
+        image: _selectedImage,
       );
       await ref.read(addBikeNotifierProvider.notifier).submitBike(bikeRequest);
       if (mounted) {
@@ -78,129 +78,130 @@ class _AddBikeScreenState extends ConsumerState<AddBikeScreen> {
 
     return CommonScaffold(
       title: 'Add Bike',
-      fab: FloatingActionButton(
-        onPressed: state.isLoading
-            ? null
-            : () async {
+      fab: state.isLoading
+          ? null
+          : FloatingActionButton(
+              onPressed: () async {
                 await _handleSubmit();
               },
-        child: state.isLoading
-            ? CircularProgressIndicator()
-            : Icon(Icons.cloud_upload),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              PickImage(
-                onSet: (value) {
-                  if (value != null) _selectedImage = value;
-                  print(_selectedImage);
-                },
-                defaultImage: "assets/images/default_bike.png",
-                size: 200,
-                circle: false,
-              ),
-              const SizedBox(height: 16),
+              child: Icon(Icons.cloud_upload),
+            ),
+      body: state.isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    PickImage(
+                      onSet: (value) {
+                        if (value != null) _selectedImage = value;
+                        setState(() {});
+                      },
+                      defaultImage: "assets/images/default_bike.png",
+                      size: 200,
+                      circle: false,
+                      selectedImage: _selectedImage,
+                    ),
+                    const SizedBox(height: 16),
 
-              // Brand field
-              OutlinedTextField(
-                controller: _brandController,
-                labelText: 'Brand',
-                hintText: 'Enter bike brand',
-                prefixIcon: const Icon(Icons.business),
-                validator: AddBikeValidators.validateBrand,
-              ),
-              const SizedBox(height: 16),
+                    // Brand field
+                    OutlinedTextField(
+                      controller: _brandController,
+                      labelText: 'Brand',
+                      hintText: 'Enter bike brand',
+                      prefixIcon: const Icon(Icons.business),
+                      validator: AddBikeValidators.validateBrand,
+                    ),
+                    const SizedBox(height: 16),
 
-              // Model field
-              OutlinedTextField(
-                controller: _modelController,
-                labelText: 'Model',
-                hintText: 'Enter bike model',
-                prefixIcon: const Icon(Icons.two_wheeler),
-                validator: AddBikeValidators.validateModel,
-              ),
-              const SizedBox(height: 16),
+                    // Model field
+                    OutlinedTextField(
+                      controller: _modelController,
+                      labelText: 'Model',
+                      hintText: 'Enter bike model',
+                      prefixIcon: const Icon(Icons.two_wheeler),
+                      validator: AddBikeValidators.validateModel,
+                    ),
+                    const SizedBox(height: 16),
 
-              // Engine CC field
-              OutlinedTextField(
-                controller: _engineCcController,
-                labelText: 'Engine CC',
-                hintText: 'Enter engine capacity',
-                prefixIcon: const Icon(Icons.speed),
-                keyboardType: TextInputType.number,
-                validator: AddBikeValidators.validateEngineCC,
-              ),
-              const SizedBox(height: 16),
+                    // Engine CC field
+                    OutlinedTextField(
+                      controller: _engineCcController,
+                      labelText: 'Engine CC',
+                      hintText: 'Enter engine capacity',
+                      prefixIcon: const Icon(Icons.speed),
+                      keyboardType: TextInputType.number,
+                      validator: AddBikeValidators.validateEngineCC,
+                    ),
+                    const SizedBox(height: 16),
 
-              // Model Year field
-              OutlinedTextField(
-                controller: _modelYearController,
-                labelText: 'Model Year',
-                hintText: 'Enter model year',
-                prefixIcon: const Icon(Icons.calendar_today),
-                keyboardType: TextInputType.number,
-                validator: AddBikeValidators.validateModelYear,
-              ),
-              const SizedBox(height: 16),
+                    // Model Year field
+                    OutlinedTextField(
+                      controller: _modelYearController,
+                      labelText: 'Model Year',
+                      hintText: 'Enter model year',
+                      prefixIcon: const Icon(Icons.calendar_today),
+                      keyboardType: TextInputType.number,
+                      validator: AddBikeValidators.validateModelYear,
+                    ),
+                    const SizedBox(height: 16),
 
-              // Fuel Type dropdown
-              DropdownWidget(
-                items: fuelType,
-                onChanged: (value) {
-                  _selectedFuelType = value ?? "";
-                },
-                labelText: "Fuel Type",
-                prefixIcon: Icons.local_gas_station,
-              ),
-              const SizedBox(height: 16),
+                    // Fuel Type dropdown
+                    DropdownWidget(
+                      items: fuelType,
+                      onChanged: (value) {
+                        _selectedFuelType = value ?? "";
+                      },
+                      labelText: "Fuel Type",
+                      prefixIcon: Icons.local_gas_station,
+                    ),
+                    const SizedBox(height: 16),
 
-              // Expected Mileage field
-              OutlinedTextField(
-                controller: _expectedMileageController,
-                labelText: 'Expected Mileage (km/l)',
-                hintText: 'Enter expected mileage',
-                prefixIcon: const Icon(Icons.analytics),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
+                    // Expected Mileage field
+                    OutlinedTextField(
+                      controller: _expectedMileageController,
+                      labelText: 'Expected Mileage (km/l)',
+                      hintText: 'Enter expected mileage',
+                      prefixIcon: const Icon(Icons.analytics),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      validator: AddBikeValidators.validateExpectedMileage,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Tank Capacity field
+                    OutlinedTextField(
+                      controller: _tankCapacityController,
+                      labelText: 'Tank Capacity (liters)',
+                      hintText: 'Enter tank capacity',
+                      prefixIcon: const Icon(Icons.water_drop),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      validator: AddBikeValidators.validateTankCapacity,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Reserve Capacity field (optional)
+                    OutlinedTextField(
+                      controller: _reserveCapacityController,
+                      labelText: 'Reserve Capacity (liters)',
+                      hintText: 'Enter reserve capacity (optional)',
+                      prefixIcon: const Icon(Icons.water_drop_outlined),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      validator: AddBikeValidators.validateReserveCapacity,
+                    ),
+                    const SizedBox(height: 24),
+                  ],
                 ),
-                validator: AddBikeValidators.validateExpectedMileage,
               ),
-              const SizedBox(height: 16),
-
-              // Tank Capacity field
-              OutlinedTextField(
-                controller: _tankCapacityController,
-                labelText: 'Tank Capacity (liters)',
-                hintText: 'Enter tank capacity',
-                prefixIcon: const Icon(Icons.water_drop),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                validator: AddBikeValidators.validateTankCapacity,
-              ),
-              const SizedBox(height: 16),
-
-              // Reserve Capacity field (optional)
-              OutlinedTextField(
-                controller: _reserveCapacityController,
-                labelText: 'Reserve Capacity (liters)',
-                hintText: 'Enter reserve capacity (optional)',
-                prefixIcon: const Icon(Icons.water_drop_outlined),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                ),
-                validator: AddBikeValidators.validateReserveCapacity,
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

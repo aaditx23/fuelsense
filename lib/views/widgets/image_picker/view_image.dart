@@ -5,20 +5,20 @@ import 'package:flutter/material.dart';
 class ViewImage extends StatelessWidget {
   final bool circle;
   final double size;
-  final bool memory;
+  final bool isAsset;
   final String image;
   const ViewImage({
     super.key,
     required this.circle,
     required this.size,
-    required this.memory,
+    required this.isAsset,
     required this.image,
   });
 
   @override
   Widget build(BuildContext context) {
     final bgColor = Colors.grey.withAlpha((0.5 * 255).toInt());
-    final imageProvider = memory
+    final imageProvider = isAsset
         ? AssetImage(image)
         : MemoryImage(base64Decode(image));
     return Padding(
@@ -38,7 +38,7 @@ class ViewImage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                   child: Image(
                     image: imageProvider as ImageProvider,
-                    width: size * 2,
+                    width: size,
                     fit: BoxFit.cover,
                   ),
                 ),

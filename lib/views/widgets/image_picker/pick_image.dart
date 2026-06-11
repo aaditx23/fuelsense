@@ -17,7 +17,7 @@ class PickImage extends StatefulWidget {
     required this.onSet,
     required this.defaultImage,
     required this.circle,
-    this.selectedImage
+    this.selectedImage,
   });
 
   @override
@@ -26,21 +26,30 @@ class PickImage extends StatefulWidget {
 
 class _PickImageState extends State<PickImage> {
   String? image;
+
+  @override
+  void initState() {
+    super.initState();
+    image = widget.selectedImage;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
         image = await pickCropImage(ImageSource.gallery);
-        if (image != null) widget.onSet(image);
-        setState(() {});
+        if (image != null) {
+          widget.onSet(image);
+          setState(() {});
+        }
       }, // Use the provided onClick callback
       child: Stack(
         alignment: Alignment.center,
         children: [
           ViewImage(
             circle: widget.circle,
-            size: widget.size / 2,
-            memory: image == null,
+            size: widget.size,
+            isAsset: image == null,
             image: (image == null) ? widget.defaultImage : image!,
           ),
 
@@ -54,7 +63,7 @@ class _PickImageState extends State<PickImage> {
               padding: const EdgeInsets.all(4),
               child: Icon(
                 Icons.upload,
-                size: widget.size * 0.22,
+                // size: widget.size * 0.22,
                 color: Theme.of(context).primaryColor,
               ),
             ),
