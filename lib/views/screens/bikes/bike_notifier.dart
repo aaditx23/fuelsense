@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:fuelsense/data/remote/bike/bike_repository.dart';
 import 'package:fuelsense/data/remote/bike/schema/bike_response.dart';
@@ -18,12 +17,61 @@ class BikeNotifier extends StateNotifier<BikeState> {
 
   Future<void> fetchBikes() async {
     final token = prefs.getToken();
+    if(token == null) return;
     state = state.copyWith(isLoading: true, message: null);
     try {
-      final BikeResponse response = await repository.fetchAllBikes(token ?? "");
-      print("Respoesns: ${response.success} ${response.message}");
-      state = state.copyWith(isLoading: false, bikes: response.data, isSuccess: response.success, message: response.message);
+      final bikeListResponse = await repository.fetchAllBikes(token);
+      final myBikeResponse = await repository.getMyBikes(token);
+      state = state.copyWith(
+          isLoading: false,
+          bikes: bikeListResponse.data,
+          isSuccess: bikeListResponse.success,
+          message: bikeListResponse.message,
+          myBikes: myBikeResponse.data?.map((bike) => bike.id).toList()
+      );
     } catch (e) {
+      print(e.toString());
+      state = state.copyWith(isLoading: false, isSuccess: false, message: e.toString());
+    }
+  }
+
+  Future<void> selectBike(int bikeId) async{
+    final token = prefs.getToken();
+    if (token == null) return ;
+    state = state.copyWith(isLoading: true, message: null);
+    try{
+      final response = await repository.selectBike(token, bikeId);
+      final myBikes = state.myBikes;
+      state = state.copyWith(
+          isLoading: false,
+          bikes: null,
+          isSuccess: response.success,
+          message: response.message,
+          myBikes: (myBikes != null)?  myBikes + [bikeId] : [bikeId]
+      );
+    }
+    catch (e){
+      print(e.toString());
+      state = state.copyWith(isLoading: false, isSuccess: false, message: e.toString());
+    }
+  }
+  Future<void> removeBike(int bikeId) async{
+    final token = prefs.getToken();
+    if (token == null) return ;
+    state = state.copyWith(isLoading: true, message: null);
+    try{
+      final response = await repository.removeMyBike(token, bikeId);
+      final myBikes = state.myBikes;
+      if(myBikes != null) myBikes.remove(bikeId);
+      state = state.copyWith(
+          isLoading: false,
+          bikes: null,
+          isSuccess: response.success,
+          message: response.message,
+          myBikes: myBikes
+      );
+    }
+    catch (e){
       print(e.toString());
       state = state.copyWith(isLoading: false, isSuccess: false, message: e.toString());
     }

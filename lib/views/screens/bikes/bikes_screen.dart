@@ -67,7 +67,12 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
                         itemCount: filteredBikes.length,
                         itemBuilder: (context, index) {
                           final bike = filteredBikes[index];
-                          return BikeCard(bike: bike);
+                          final inMyBikes = (state.myBikes == null)? false : state.myBikes!.contains(bike.id);
+                          return BikeCard(bike: bike, inMyBikes: inMyBikes, onAction: () {
+                            inMyBikes
+                                ? ref.read(bikeNotifierProvider.notifier).removeBike(bike.id)
+                                : ref.read(bikeNotifierProvider.notifier).selectBike(bike.id);
+                          },);
                         },
                       ),
           ),

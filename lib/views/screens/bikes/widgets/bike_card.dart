@@ -6,10 +6,14 @@ import 'package:fuelsense/views/screens/bikes/widgets/bike_details.dart';
 
 class BikeCard extends StatelessWidget {
   final BikeModel bike;
+  final bool inMyBikes;
+  final Function onAction;
 
   const BikeCard({
     super.key,
     required this.bike,
+    required this.inMyBikes,
+    required this.onAction
   });
 
   @override
@@ -24,7 +28,7 @@ class BikeCard extends StatelessWidget {
         elevation: 0,
         child: InkWell(
           onTap: (){
-            bikeDetails(context, bike);
+            bikeDetails(context, bike, inMyBikes, onAction);
           },
           borderRadius: BorderRadius.circular(36.0),
           child: Padding(
@@ -64,7 +68,9 @@ class BikeCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                IconButton(onPressed: (){}, icon: Icon(Icons.add))
+                IconButton(onPressed: (){
+                  onAction();
+                }, icon: Icon(inMyBikes? Icons.remove : Icons.add))
               ],
             ),
           ),

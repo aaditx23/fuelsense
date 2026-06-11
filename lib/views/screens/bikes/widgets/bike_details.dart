@@ -4,8 +4,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fuelsense/data/remote/bike/schema/bike_model.dart';
 
-Future<void> bikeDetails(BuildContext context, BikeModel bike) async {
+Future<void> bikeDetails(BuildContext context, BikeModel bike, bool inMyBikes, Function onAction) async {
   return showDialog(context: context, builder: (BuildContext context) {
+    final buttonText = inMyBikes? "Remove": "Add";
+    final buttonIcon = inMyBikes? Icons.remove : Icons.add;
     return AlertDialog(
       title: ClipRRect(
         borderRadius: BorderRadiusGeometry.circular(36.0),
@@ -144,7 +146,14 @@ Future<void> bikeDetails(BuildContext context, BikeModel bike) async {
         ],
       ),
       actions: [
-        FilledButton(onPressed: (){}, child: Row(mainAxisSize: MainAxisSize.min,children: [Text("Add "), Icon(Icons.add)],)),
+        FilledButton(
+        onPressed: (){
+          onAction();
+          Navigator.of(context).pop();
+        },
+            // child: Row(mainAxisSize: MainAxisSize.min,children: [Icon(buttonIcon), Text(buttonText)],),
+            child: Text(buttonText),
+        ),
         TextButton(onPressed: (){
           Navigator.of(context).pop();
     }, child: Text("Close")
