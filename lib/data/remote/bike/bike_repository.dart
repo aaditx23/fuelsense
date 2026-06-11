@@ -95,4 +95,16 @@ class BikeRepository {
     final bikeResponse = BikeResponse.fromJson(jsonResponse);
     return bikeResponse;
   }
+
+  Future<AddBikeResponse> approveBike(String token, int bikeId) async {
+    final response = await http.put(
+      Uri.parse("$baseUrl/admin/bikes/$bikeId/approve/"),
+      headers: authorizedHeader(token),
+      body: jsonEncode({"bikeId": bikeId}),
+    );
+
+    final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+    final bikeResponse = AddBikeResponse.fromJson(jsonResponse);
+    return bikeResponse;
+  }
 }

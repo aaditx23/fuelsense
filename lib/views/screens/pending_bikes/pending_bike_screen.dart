@@ -23,16 +23,16 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => _loadBikes());
+    _loadBikes();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    Future.microtask(() => _loadBikes());
+    _loadBikes();
   }
 
-  Future<void> _loadBikes() async {
+  void _loadBikes() {
     Future.microtask(
       () => ref.read(pendingBikesNotifierProvider.notifier).pendingBikes(),
     );
@@ -113,6 +113,9 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
                             ),
                             FilledButton(
                               onPressed: () {
+                                ref
+                                    .read(pendingBikesNotifierProvider.notifier)
+                                    .approveBike(bike.id);
                                 Navigator.of(context).pop();
                               },
                               child: Text("Add"),

@@ -95,6 +95,7 @@ class _EditBikeScreenState extends ConsumerState<EditBikeScreen> {
     final state = ref.watch(addBikeNotifierProvider);
 
     return CommonScaffold(
+      showDrawer: false,
       title: 'Edit Bike',
       fab: state.isLoading
           ? null

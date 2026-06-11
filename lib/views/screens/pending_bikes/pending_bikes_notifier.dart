@@ -49,17 +49,36 @@ class PendingBikesNotifier extends StateNotifier<PendingBikeState> {
   Future<void> editBike(int id, BikeRequest bikeRequest) async {
     final token = prefs.getToken();
     if (token == null) return;
-    state = state.copyWith(
-      isLoading: true,
-      isSuccess: false,
-      message: null,
-    );
+    state = state.copyWith(isLoading: true, isSuccess: false, message: null);
     try {
       final response = await bikeRepository.editBike(token, bikeRequest, id);
       state = state.copyWith(
         isLoading: false,
         isSuccess: response.success,
         message: response.message,
+      );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        isSuccess: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<void> approveBike(int id) async {
+    final token = prefs.getToken();
+    if (token == null) return;
+    state = state.copyWith(isLoading: true, isSuccess: false, message: null);
+    try {
+      final response = await bikeRepository.approveBike(token, id);
+      state = state.copyWith(
+        isLoading: false,
+        isSuccess: response.success,
+        message: response.message,
+        pendingBikes: state.pendingBikes
+            .where((bike) => bike.id != id)
+            .toList(),
       );
     } catch (e) {
       state = state.copyWith(

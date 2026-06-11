@@ -22,6 +22,16 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
   @override
   void initState() {
     super.initState();
+    _loadBikes();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadBikes();
+  }
+
+  void _loadBikes() {
     Future.microtask(
       () => ref.read(bikeNotifierProvider.notifier).fetchBikes(),
     );
@@ -94,6 +104,20 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
                               },
                               child: Text("Close"),
                             ),
+                            if (ref
+                                .read(bikeNotifierProvider.notifier)
+                                .isAdmin())
+                              OutlinedButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                  Navigator.pushNamed(
+                                    context,
+                                    "/edit_bike",
+                                    arguments: bike,
+                                  );
+                                },
+                                child: Text("Edit"),
+                              ),
                             FilledButton(
                               onPressed: () {
                                 inMyBikes
