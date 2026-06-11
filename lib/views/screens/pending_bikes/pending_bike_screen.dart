@@ -46,8 +46,9 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(pendingBikesNotifierProvider);
-    final _filteredBikes = _filterBikes(state.pendingBikes);
+    final filteredBikes = _filterBikes(state.pendingBikes);
     return CommonScaffold(
+      title: "Pending Bikes",
       body: Column(
         children: [
           SearchBarWidget(
@@ -70,9 +71,9 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
                   )
                 : state.pendingBikes.isNotEmpty
                 ? ListView.builder(
-                    itemCount: _filteredBikes.length,
+                    itemCount: filteredBikes.length,
                     itemBuilder: (context, index) {
-                      final bike = _filteredBikes[index];
+                      final bike = filteredBikes[index];
                       return PendingBikeCard(bike: bike, onAdd: () {});
                     },
                   )

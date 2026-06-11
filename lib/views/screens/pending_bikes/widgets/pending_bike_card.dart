@@ -176,8 +176,13 @@ class PendingBikeCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(onPressed: () {}, child: Text("Edit")),
-                FilledButton(onPressed: () => onAdd(), child: Text("Add")),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, "/edit_bike", arguments: bike);
+                  },
+                  child: Text("Edit"),
+                ),
+                FilledButton(onPressed: () => onAdd(), child: Text("Confirm")),
               ],
             ),
           ],
