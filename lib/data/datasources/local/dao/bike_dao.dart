@@ -35,4 +35,15 @@ abstract class BikeDao {
 
   @update
   Future<int> updateBike(BikeEntity bike);
+
+  // --- Reactive (Stream) queries — equivalent to Room Flow<List<X>> ---
+
+  @Query('SELECT * FROM bikes WHERE isPending = 0')
+  Stream<List<BikeEntity>> watchAllAvailableBikes();
+
+  @Query('SELECT * FROM bikes WHERE isMine = 1')
+  Stream<List<BikeEntity>> watchMyBikes();
+
+  @Query('SELECT * FROM bikes WHERE isPending = 1')
+  Stream<List<BikeEntity>> watchPendingBikes();
 }

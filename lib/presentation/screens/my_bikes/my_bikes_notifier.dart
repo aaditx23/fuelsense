@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/di/setup_di.dart';
+import 'package:fuelsense/domain/entities/bike/bike.dart';
+import 'package:fuelsense/domain/repositories/bike_repository.dart';
 import 'package:fuelsense/domain/usecases/bike/get_my_bikes_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/remove_bike_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/sync_my_bikes_usecase.dart';
@@ -85,3 +88,9 @@ final myBikesNotifierProvider =
         syncMyBikesUseCase: syncMyBikesUseCase,
       );
     });
+
+// --- Reactive (Stream) provider — auto-updates UI on any DB change ---
+// Equivalent to Kotlin: viewModel.myBikes.collect { ... }
+final myBikesStreamProvider = StreamProvider<List<Bike>>((ref) {
+  return getIt<BikeRepository>().watchMyBikes();
+});

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/domain/entities/bike/bike.dart';
 import 'package:fuelsense/presentation/screens/my_bikes/widgets/my_bike_card.dart';
 import 'package:fuelsense/presentation/widgets/common_scaffold.dart';
-import 'package:fuelsense/presentation/widgets/response_text.dart';
 import 'package:fuelsense/presentation/widgets/search_bar_widget.dart';
 import 'my_bikes_notifier.dart';
 
@@ -48,8 +47,9 @@ class _BikesScreenState extends ConsumerState<MyBikesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(myBikesNotifierProvider);
-    final filteredBikes = _filterBikes(state.myBikes);
+    final notifierState = ref.watch(myBikesNotifierProvider);
+    final bikesAsync = ref.watch(myBikesStreamProvider);
+    final filteredBikes = _filterBikes(bikesAsync.asData?.value ?? []);
     return CommonScaffold(
       showDrawer: true,
       title: "Bikes",
@@ -64,42 +64,47 @@ class _BikesScreenState extends ConsumerState<MyBikesScreen> {
             },
           ),
           Expanded(
-            child: state.isLoading
+            child:
+                notifierState.isLoading &&
+                    (bikesAsync.asData?.value ?? []).isEmpty
                 ? const Center(child: CircularProgressIndicator())
-                : state.message != null && !state.isSuccess
-                ? Center(
-                    child: ResponseText(
-                      success: state.isSuccess,
-                      message: state.message!,
-                    ),
-                  )
-                : state.myBikes.isNotEmpty
-                ? ListView.builder(
-                    itemCount: filteredBikes.length,
-                    itemBuilder: (context, index) {
-                      final bike = filteredBikes[index];
-                      print("MY BIKE ${bike.isMine}");
-                      return MyBikeCard(
-                        bike: bike,
-                        onAction: () {
-                          ref
-                              .read(myBikesNotifierProvider.notifier)
-                              .removeBike(bike.id);
-                        },
-                      );
-                    },
-                  )
-                : Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacementNamed(context, "/bikes");
-                        },
-                        child: Text("Click Here to browse and add bikes"),
-                      ),
-                    ],
+                : bikesAsync.when(
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(child: Text('Error: $e')),
+                    data: (_) => filteredBikes.isNotEmpty
+                        ? ListView.builder(
+                            itemCount: filteredBikes.length,
+                            itemBuilder: (context, index) {
+                              final bike = filteredBikes[index];
+                              print("MY BIKE ${bike.isMine}");
+                              return MyBikeCard(
+                                bike: bike,
+                                onAction: () {
+                                  ref
+                                      .read(myBikesNotifierProvider.notifier)
+                                      .removeBike(bike.id);
+                                },
+                              );
+                            },
+                          )
+                        : Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pushReplacementNamed(
+                                    context,
+                                    "/bikes",
+                                  );
+                                },
+                                child: Text(
+                                  "Click Here to browse and add bikes",
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
           ),
         ],

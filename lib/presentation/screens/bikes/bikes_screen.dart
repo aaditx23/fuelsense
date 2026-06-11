@@ -59,8 +59,11 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(bikeNotifierProvider);
-    final filteredBikes = _filterBikes(state.bikes);
+    final notifierState = ref.watch(bikeNotifierProvider);
+    // Stream-based watch — auto-rebuilds whenever local DB changes
+    final bikesAsync = ref.watch(allBikesStreamProvider);
+    final filteredBikes = _filterBikes(bikesAsync.asData?.value ?? []);
+
     return CommonScaffold(
       showDrawer: true,
       title: "Bikes",
@@ -75,94 +78,105 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
             },
           ),
           Expanded(
-            child: state.isLoading
+            child:
+                notifierState.isLoading &&
+                    (bikesAsync.asData?.value ?? []).isEmpty
                 ? const Center(child: CircularProgressIndicator())
-                : state.message != null && !state.isSuccess
-                ? Center(child: Text(state.message!))
-                : ListView.builder(
-                    itemCount: filteredBikes.length,
-                    itemBuilder: (context, index) {
-                      final bike = filteredBikes[index];
-                      print("BIKE: ${bike.model} ${bike.isMine}");
-                      return BikeCard(
-                        bike: bike,
-                        trailingIcon: IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            bike.isMine
-                                ? Icons.done_outline_rounded
-                                : Icons.remove_red_eye,
-                          ),
-                        ),
-                        onTap: () {
-                          bikeDetails(context, bike, [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                Expanded(
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: IconButton(
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      icon: Icon(Icons.arrow_back_ios),
-                                    ),
-                                  ),
-                                ),
-                                if (ref
-                                    .read(bikeNotifierProvider.notifier)
-                                    .isAdmin()) ...[
-                                  IconButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      Navigator.pushNamed(
-                                        context,
-                                        "/edit_bike",
-                                        arguments: bike,
-                                      );
-                                    },
-                                    icon: Icon(Icons.edit),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                      ref
-                                          .read(bikeNotifierProvider.notifier)
-                                          .deleteBike(bike.id);
-                                    },
-                                    icon: Icon(Icons.delete),
-                                  ),
-                                ],
-                                IconButton(
-                                  onPressed: () {
-                                    bike.isMine
-                                        ? ref
-                                              .read(
-                                                bikeNotifierProvider.notifier,
-                                              )
-                                              .removeBike(bike.id)
-                                        : ref
-                                              .read(
-                                                bikeNotifierProvider.notifier,
-                                              )
-                                              .selectBike(bike.id);
-
-                                    Navigator.of(context).pop();
-                                  },
+                : bikesAsync.when(
+                    loading: () =>
+                        const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(child: Text('Error: $e')),
+                    data: (_) => filteredBikes.isEmpty
+                        ? const Center(child: Text('No bikes found'))
+                        : ListView.builder(
+                            itemCount: filteredBikes.length,
+                            itemBuilder: (context, index) {
+                              final bike = filteredBikes[index];
+                              print("BIKE: ${bike.model} ${bike.isMine}");
+                              return BikeCard(
+                                bike: bike,
+                                trailingIcon: IconButton(
+                                  onPressed: () {},
                                   icon: Icon(
                                     bike.isMine
-                                        ? Icons.remove_circle
-                                        : Icons.add_circle,
+                                        ? Icons.done_outline_rounded
+                                        : Icons.remove_red_eye,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ]);
-                        },
-                      );
-                    },
+                                onTap: () {
+                                  bikeDetails(context, bike, [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        Expanded(
+                                          child: Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: IconButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                              icon: Icon(Icons.arrow_back_ios),
+                                            ),
+                                          ),
+                                        ),
+                                        if (ref
+                                            .read(bikeNotifierProvider.notifier)
+                                            .isAdmin()) ...[
+                                          IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                              Navigator.pushNamed(
+                                                context,
+                                                "/edit_bike",
+                                                arguments: bike,
+                                              );
+                                            },
+                                            icon: Icon(Icons.edit),
+                                          ),
+                                          IconButton(
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                              ref
+                                                  .read(
+                                                    bikeNotifierProvider
+                                                        .notifier,
+                                                  )
+                                                  .deleteBike(bike.id);
+                                            },
+                                            icon: Icon(Icons.delete),
+                                          ),
+                                        ],
+                                        IconButton(
+                                          onPressed: () {
+                                            bike.isMine
+                                                ? ref
+                                                      .read(
+                                                        bikeNotifierProvider
+                                                            .notifier,
+                                                      )
+                                                      .removeBike(bike.id)
+                                                : ref
+                                                      .read(
+                                                        bikeNotifierProvider
+                                                            .notifier,
+                                                      )
+                                                      .selectBike(bike.id);
+                                            Navigator.of(context).pop();
+                                          },
+                                          icon: Icon(
+                                            bike.isMine
+                                                ? Icons.remove_circle
+                                                : Icons.add_circle,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ]);
+                                },
+                              );
+                            },
+                          ),
                   ),
           ),
         ],

@@ -34,4 +34,9 @@ abstract class PendingOperationDao {
     'SELECT COUNT(*) FROM pending_operations WHERE entityType = :entityType',
   )
   Future<int?> getPendingOperationsCountByEntityType(String entityType);
+
+  // --- Reactive (Stream) query ---
+
+  @Query('SELECT * FROM pending_operations ORDER BY createdAt ASC')
+  Stream<List<PendingOperationEntity>> watchAllPendingOperations();
 }

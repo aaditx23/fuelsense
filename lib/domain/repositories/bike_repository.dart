@@ -1,5 +1,6 @@
 import 'package:fuelsense/data/models/base_response.dart';
 import 'package:fuelsense/domain/entities/bike/add_bike_response.dart';
+import 'package:fuelsense/domain/entities/bike/bike.dart';
 import 'package:fuelsense/domain/entities/bike/bike_request.dart';
 import 'package:fuelsense/domain/entities/bike/bike_response.dart';
 
@@ -20,4 +21,9 @@ abstract class BikeRepository {
   Future<void> syncAllBikes(String token);
   Future<void> syncMyBikes(String token);
   Future<void> syncPendingBikes(String token);
+
+  // --- Reactive (Stream) reads — equivalent to Room Flow<List<X>> ---
+  Stream<List<Bike>> watchAllBikes();
+  Stream<List<Bike>> watchMyBikes();
+  Stream<List<Bike>> watchPendingBikes();
 }

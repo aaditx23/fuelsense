@@ -4,6 +4,7 @@ import 'package:fuelsense/data/datasources/remote/bike/bike_api_service.dart';
 import 'package:fuelsense/data/mappers/bike_mapper.dart';
 import 'package:fuelsense/data/models/base_response.dart';
 import 'package:fuelsense/domain/entities/bike/add_bike_response.dart';
+import 'package:fuelsense/domain/entities/bike/bike.dart';
 import 'package:fuelsense/domain/entities/bike/bike_request.dart';
 import 'package:fuelsense/domain/entities/bike/bike_response.dart';
 import 'package:fuelsense/data/datasources/local/dao/bike_dao.dart';
@@ -384,5 +385,28 @@ class BikeRepositoryImpl implements BikeRepository {
       success: true,
       message: 'Bike deleted successfully',
     );
+  }
+
+  // --- Reactive (Stream) reads ---
+
+  @override
+  Stream<List<Bike>> watchAllBikes() {
+    return bikeDao
+        .watchAllAvailableBikes()
+        .map((entities) => entities.map(BikeMapper.toDomainBikeFromEntity).toList());
+  }
+
+  @override
+  Stream<List<Bike>> watchMyBikes() {
+    return bikeDao
+        .watchMyBikes()
+        .map((entities) => entities.map(BikeMapper.toDomainBikeFromEntity).toList());
+  }
+
+  @override
+  Stream<List<Bike>> watchPendingBikes() {
+    return bikeDao
+        .watchPendingBikes()
+        .map((entities) => entities.map(BikeMapper.toDomainBikeFromEntity).toList());
   }
 }
