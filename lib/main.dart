@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:template_flutter/di/setup_di.dart';
-import 'package:template_flutter/navigation/routes.dart';
+import 'package:fuelsense/di/setup_di.dart';
+import 'package:fuelsense/navigation/routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: "/screen01",
       routes: getRoute(context),
-      title: 'template_flutter',
+      title: 'fuelsense',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

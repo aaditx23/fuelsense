@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:template_flutter/views/screens/screen01/screen01_notifier.dart';
+import 'package:fuelsense/views/screens/screen01/screen01_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class Screen01 extends ConsumerStatefulWidget {

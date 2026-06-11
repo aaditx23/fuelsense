@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:template_flutter/di/setup_di.dart';
-import 'package:template_flutter/data/local/dao/name_dao.dart';
-import 'package:template_flutter/data/local/entity/name_entity.dart';
-import 'package:template_flutter/views/screens/screen01/screen01_state.dart';
+import 'package:fuelsense/di/setup_di.dart';
+import 'package:fuelsense/data/local/dao/name_dao.dart';
+import 'package:fuelsense/data/local/entity/name_entity.dart';
+import 'package:fuelsense/views/screens/screen01/screen01_state.dart';
 
 class Screen01Notifier extends StateNotifier<Screen01State> {
   Screen01Notifier() : super(Screen01State(namesList: []));

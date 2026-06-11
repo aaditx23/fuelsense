@@ -1,6 +1,6 @@
-# Flutter Template 🚀
+# fuelsense 🚀
 
-A production-ready Flutter template with clean architecture, dependency injection, local database, and API integration.
+A production-ready fuelsense with clean architecture, dependency injection, local database, and API integration.
 
 ## 📁 Project Structure
 
@@ -75,7 +75,7 @@ lib/
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd template_flutter
+   cd fuelsense
    ```
 
 2. **Install dependencies**

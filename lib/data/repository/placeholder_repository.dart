@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:template_flutter/data/model/todo_model.dart';
+import 'package:fuelsense/data/model/todo_model.dart';
 import "package:http/http.dart" as http;
 
 class PlaceholderRepository {

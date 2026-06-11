@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:template_flutter/views/screens/screen02/screen02_notifier.dart';
-import 'package:template_flutter/views/screens/screen02/screen02_state.dart';
+import 'package:fuelsense/views/screens/screen02/screen02_notifier.dart';
+import 'package:fuelsense/views/screens/screen02/screen02_state.dart';
 
 class Screen02 extends ConsumerStatefulWidget {
   const Screen02({super.key});
