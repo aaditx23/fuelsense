@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/views/screens/profile/profile_notifier.dart';
+import 'package:fuelsense/views/widgets/profile_image_widget.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -24,17 +25,20 @@ class ProfileScreen extends ConsumerWidget {
                           padding: const EdgeInsets.all(24),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text('Username: ${state.user!.username}', style: const TextStyle(fontSize: 18)),
+                              Center(
+                                child: ProfileImageWidget(
+                                  imageUrl: state.user!.profile_image,
+                                  radius: 48,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text('Name: ${state.user!.username}', style: const TextStyle(fontSize: 18)),
                               const SizedBox(height: 8),
                               Text('Email: ${state.user!.email}', style: const TextStyle(fontSize: 16)),
                               const SizedBox(height: 8),
                               Text('Role: ${state.user!.role}', style: const TextStyle(fontSize: 16)),
-                              if (state.user!.profile_image != null && state.user!.profile_image!.isNotEmpty) ...[
-                                const SizedBox(height: 16),
-                                Image.network(state.user!.profile_image!, height: 100, width: 100, fit: BoxFit.cover),
-                              ],
                             ],
                           ),
                         ),

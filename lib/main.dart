@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fuelsense/data/local/shared_preferences/shared_preferences.dart';
 import 'package:fuelsense/di/setup_di.dart';
 import 'package:fuelsense/navigation/routes.dart';
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: "/login",
+      initialRoute: getInitialRoute(),
       routes: getRoute(context),
       title: 'fuelsense',
       debugShowCheckedModeBanner: false,

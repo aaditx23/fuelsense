@@ -8,32 +8,43 @@ import 'package:fuelsense/views/screens/auth/login/login_state.dart';
 import 'package:http/http.dart';
 
 class LoginNotifier extends StateNotifier<LoginState> {
-  LoginNotifier() : super(LoginState(isLoading: false, isSuccess: false));
+  final AuthRepository authRepository;
+  final UserDao userDao;
+  final AppSharedPreferences prefs;
+  LoginNotifier({
+    required this.authRepository,
+    required this.userDao,
+    required this.prefs
+}) : super(LoginState(isLoading: false, isSuccess: false));
 
-  final AuthRepository _authRepository = getIt<AuthRepository>();
-  final UserDao _userDao = getIt<UserDao>();
-  final AppSharedPreferences prefs = getIt<AppSharedPreferences>();
 
   Future<void> login(LoginRequest loginRequest) async {
     state = state.copyWith(isLoading: true, message: null);
-    final response = await _authRepository.login(loginRequest);
+    final response = await authRepository.login(loginRequest);
+
+    final userResponse = response.data;
+    if(userResponse != null){
+      final user = userResponse.toEntity(loginRequest.password);
+      await prefs.saveUserId(user.id);
+      if(response.access_token != null) await prefs.saveToken(response.access_token!);
+      await userDao.createUser(user);
+    }
     state = state.copyWith(
       isLoading: false,
       isSuccess: response.success,
       message: response.message,
       code: response.code,
     );
-
-    final userResponse = response.data;
-    if(userResponse != null){
-      final user = userResponse.toEntity(loginRequest.password);
-      await prefs.saveUserId(user.id);
-      await _userDao.createUser(user);
-
-    }
   }
 }
 
 final loginNotifier = StateNotifierProvider((ref) {
-  return LoginNotifier();
+  final AuthRepository authRepository = getIt<AuthRepository>();
+  final UserDao userDao = getIt<UserDao>();
+  final AppSharedPreferences prefs = getIt<AppSharedPreferences>();
+  return LoginNotifier(
+    authRepository: authRepository,
+    userDao: userDao,
+    prefs: prefs
+  );
 });

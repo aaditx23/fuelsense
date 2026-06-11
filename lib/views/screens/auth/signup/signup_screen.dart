@@ -42,7 +42,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       if (next.isSuccess) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
-            Navigator.pushReplacementNamed(context, "/screen01");
+            Navigator.pushReplacementNamed(context, "/profile");
           }
         });
       }
