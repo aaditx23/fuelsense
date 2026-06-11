@@ -190,8 +190,8 @@ class CreateRefuelNotifier extends StateNotifier<CreateRefuelState> {
           localId: state.incompleteEntry!.localId!,
           tripMeterReading: state.tripMeterReading,
           odometerReading: state.odometerReading,
-          fuelLiter: state.fuelLiter!,
-          fuelPrice: state.fuelPrice!,
+          fuelLiter: state.fuelLiter,
+          fuelPrice: state.fuelPricePerLiter, // price per liter → DB fuelPrice
         );
       } else {
         switch (state.refuelType) {
@@ -205,23 +205,15 @@ class CreateRefuelNotifier extends StateNotifier<CreateRefuelState> {
             break;
 
           case CreateRefuelType.refuel:
-            await _completeReserveEntryUseCase.execute(
-              localId: 0, // This will be ignored by the use case
-              tripMeterReading: state.tripMeterReading,
-              odometerReading: state.odometerReading,
-              fuelLiter: state.fuelLiter!,
-              fuelPrice: state.fuelPrice!,
-            );
-            break;
-
           case CreateRefuelType.topup:
             await _createTopupEntryUseCase.execute(
               userId: userId,
               userBikeId: userBikeId,
               tripMeterReading: state.tripMeterReading,
               odometerReading: state.odometerReading,
-              fuelLiter: state.fuelLiter!,
-              fuelPrice: state.fuelPrice!,
+              fuelLiter: state.fuelLiter,
+              fuelPrice:
+                  state.fuelPricePerLiter, // price per liter → DB fuelPrice
             );
             break;
         }

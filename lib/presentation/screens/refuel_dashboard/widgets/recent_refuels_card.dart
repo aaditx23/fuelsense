@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/domain/entities/refuel.dart';
 import 'package:fuelsense/presentation/screens/refuel_dashboard/refuel_dashboard_notifier.dart';
+import 'package:fuelsense/presentation/utils/number_format_utils.dart';
 import 'package:intl/intl.dart';
 
 class RecentRefuelsCard extends ConsumerWidget {
@@ -147,7 +148,7 @@ class RecentRefuelsCard extends ConsumerWidget {
             children: [
               if (refuel.fuelLiter != null)
                 Text(
-                  '${refuel.fuelLiter}L',
+                  '${formatDecimal(refuel.fuelLiter!)}L',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
@@ -155,7 +156,7 @@ class RecentRefuelsCard extends ConsumerWidget {
                 ),
               if (refuel.tripMeterReading != null)
                 Text(
-                  '${refuel.tripMeterReading} km',
+                  '${formatDecimal(refuel.tripMeterReading!)} km',
                   style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                 ),
             ],

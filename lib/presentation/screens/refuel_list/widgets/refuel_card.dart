@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/domain/entities/refuel.dart';
+import 'package:fuelsense/presentation/screens/refuel_list/refuel_list_notifier.dart';
 import 'package:fuelsense/presentation/screens/refuel_list/widgets/refuel_entry_type_helper.dart';
 import 'package:fuelsense/presentation/screens/refuel_list/widgets/refuel_info_item.dart';
-import 'package:fuelsense/presentation/screens/refuel_list/refuel_list_notifier.dart';
+import 'package:fuelsense/presentation/utils/number_format_utils.dart';
 import 'package:intl/intl.dart';
 
 class RefuelCard extends ConsumerWidget {
@@ -79,7 +80,7 @@ class RefuelCard extends ConsumerWidget {
                   Expanded(
                     child: RefuelInfoItem(
                       label: 'Trip Meter',
-                      value: '${refuel.tripMeterReading} km',
+                      value: '${formatDecimal(refuel.tripMeterReading!)} km',
                       icon: Icons.speed,
                     ),
                   ),
@@ -88,7 +89,7 @@ class RefuelCard extends ConsumerWidget {
                   Expanded(
                     child: RefuelInfoItem(
                       label: 'Odometer',
-                      value: '${refuel.odometerReading} km',
+                      value: '${formatDecimal(refuel.odometerReading!)} km',
                       icon: Icons.directions_car,
                     ),
                   ),
@@ -97,7 +98,7 @@ class RefuelCard extends ConsumerWidget {
                   Expanded(
                     child: RefuelInfoItem(
                       label: 'Fuel',
-                      value: '${refuel.fuelLiter}L',
+                      value: '${formatDecimal(refuel.fuelLiter!)}L',
                       icon: Icons.local_gas_station,
                     ),
                   ),
@@ -107,7 +108,7 @@ class RefuelCard extends ConsumerWidget {
                     child: RefuelInfoItem(
                       label: 'Cost',
                       value:
-                          '৳${(refuel.fuelPrice! * refuel.fuelLiter!).toStringAsFixed(0)}',
+                          '৳${formatDecimal(refuel.fuelPrice! * refuel.fuelLiter!)}',
                       icon: Icons.currency_rupee,
                     ),
                   ),

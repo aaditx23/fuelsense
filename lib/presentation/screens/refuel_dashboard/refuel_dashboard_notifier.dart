@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fuelsense/domain/entities/refuel.dart';
-import 'package:fuelsense/domain/usecases/refuel_usecases.dart';
-import 'package:fuelsense/domain/repositories/refuel_repository.dart';
 import 'package:fuelsense/di/setup_di.dart';
+import 'package:fuelsense/domain/entities/refuel.dart';
+import 'package:fuelsense/domain/repositories/refuel_repository.dart';
+import 'package:fuelsense/domain/usecases/refuel_usecases.dart';
 
 class RefuelDashboardState {
   final FuelMetrics? metrics;
@@ -34,17 +34,56 @@ final refuelStreamProvider = StreamProvider.family<List<Refuel>, int>((
   userBikeId,
 ) {
   final repository = getIt<RefuelRepository>();
-  // Use the repository's watch method for real-time updates
   return repository.watchRefuelsByBikeId(userBikeId);
 });
 
-// Provider for fuel metrics
-final fuelMetricsProvider = FutureProvider.family<FuelMetrics, int>((
+// StreamProvider for fuel metrics — derived reactively from the DB stream.
+// Recalculates every time the refuel list changes (no extra DB call needed).
+final fuelMetricsProvider = StreamProvider.family<FuelMetrics, int>((
   ref,
   userBikeId,
-) async {
-  final useCase = getIt<GetFuelMetricsUseCase>();
-  return await useCase.execute(userBikeId);
+) {
+  final repository = getIt<RefuelRepository>();
+  return repository.watchRefuelsByBikeId(userBikeId).map((refuels) {
+    final completedRefuels = refuels
+        .where(
+          (r) =>
+              r.entryType == RefuelEntryType.reserveComplete ||
+              r.entryType == RefuelEntryType.topup,
+        )
+        .toList();
+
+    if (completedRefuels.isEmpty) return FuelMetrics.empty();
+
+    // Average mileage
+    double totalDistance = 0;
+    double totalFuel = 0;
+    for (final r in completedRefuels) {
+      if (r.tripMeterReading != null && r.fuelLiter != null) {
+        totalDistance += r.tripMeterReading!;
+        totalFuel += r.fuelLiter!;
+      }
+    }
+    final averageMileage = totalFuel > 0 ? totalDistance / totalFuel : 0.0;
+
+    // Monthly spending (current month)
+    final now = DateTime.now();
+    double monthlySpending = 0;
+    for (final r in completedRefuels) {
+      if (r.createdAt.year == now.year &&
+          r.createdAt.month == now.month &&
+          r.fuelPrice != null &&
+          r.fuelLiter != null) {
+        monthlySpending += r.fuelPrice! * r.fuelLiter!;
+      }
+    }
+
+    return FuelMetrics(
+      averageMileage: averageMileage,
+      monthlySpending: monthlySpending,
+      totalDistance: totalDistance,
+    );
+  });
 });
 
 // Dashboard state provider that combines metrics and recent refuels
