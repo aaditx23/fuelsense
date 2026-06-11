@@ -5,6 +5,7 @@ import 'package:fuelsense/domain/usecases/bike/get_pending_bikes_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/edit_bike_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/approve_bike_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/delete_bike_usecase.dart';
+import 'package:fuelsense/domain/usecases/bike/sync_pending_bikes_usecase.dart';
 import 'package:fuelsense/presentation/screens/pending_bikes/pending_bike_state.dart';
 
 class PendingBikesNotifier extends StateNotifier<PendingBikeState> {
@@ -12,16 +13,19 @@ class PendingBikesNotifier extends StateNotifier<PendingBikeState> {
   final EditBikeUseCase _editBikeUseCase;
   final ApproveBikeUseCase _approveBikeUseCase;
   final DeleteBikeUseCase _deleteBikeUseCase;
+  final SyncPendingBikesUseCase _syncPendingBikesUseCase;
 
   PendingBikesNotifier({
     required GetPendingBikesUseCase getPendingBikesUseCase,
     required EditBikeUseCase editBikeUseCase,
     required ApproveBikeUseCase approveBikeUseCase,
     required DeleteBikeUseCase deleteBikeUseCase,
+    required SyncPendingBikesUseCase syncPendingBikesUseCase,
   }) : _getPendingBikesUseCase = getPendingBikesUseCase,
        _editBikeUseCase = editBikeUseCase,
        _approveBikeUseCase = approveBikeUseCase,
        _deleteBikeUseCase = deleteBikeUseCase,
+       _syncPendingBikesUseCase = syncPendingBikesUseCase,
        super(
          PendingBikeState(isLoading: false, isSuccess: false, pendingBikes: []),
        );
@@ -48,6 +52,19 @@ class PendingBikesNotifier extends StateNotifier<PendingBikeState> {
         message: e.toString(),
         pendingBikes: [],
       );
+    }
+  }
+
+  Future<void> syncPendingBikes() async {
+    state = state.copyWith(isLoading: true, message: null);
+    try {
+      await _syncPendingBikesUseCase();
+      // After syncing, fetch the updated data
+      await pendingBikes();
+    } catch (e) {
+      print(e.toString());
+      // If sync fails, still try to load from local storage
+      await pendingBikes();
     }
   }
 
@@ -119,10 +136,12 @@ final pendingBikesNotifierProvider =
       final editBikeUseCase = getIt<EditBikeUseCase>();
       final approveBikeUseCase = getIt<ApproveBikeUseCase>();
       final deleteBikeUseCase = getIt<DeleteBikeUseCase>();
+      final syncPendingBikesUseCase = getIt<SyncPendingBikesUseCase>();
       return PendingBikesNotifier(
         getPendingBikesUseCase: getPendingBikesUseCase,
         editBikeUseCase: editBikeUseCase,
         approveBikeUseCase: approveBikeUseCase,
         deleteBikeUseCase: deleteBikeUseCase,
+        syncPendingBikesUseCase: syncPendingBikesUseCase,
       );
     });

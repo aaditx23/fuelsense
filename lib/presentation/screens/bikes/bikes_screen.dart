@@ -32,9 +32,9 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
   }
 
   void _loadBikes() {
-    Future.microtask(
-      () => ref.read(bikeNotifierProvider.notifier).fetchBikes(),
-    );
+    Future.microtask(() {
+      ref.read(bikeNotifierProvider.notifier).syncBikes();
+    });
   }
 
   List<Bike> _filterBikes(List<Bike> bikes) {
@@ -83,15 +83,13 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
                     itemCount: filteredBikes.length,
                     itemBuilder: (context, index) {
                       final bike = filteredBikes[index];
-                      final inMyBikes = (state.myBikes == null)
-                          ? false
-                          : state.myBikes!.contains(bike.id);
+                      print("BIKE: ${bike.model} ${bike.isMine}");
                       return BikeCard(
                         bike: bike,
                         trailingIcon: IconButton(
                           onPressed: () {},
                           icon: Icon(
-                            inMyBikes
+                            bike.isMine
                                 ? Icons.done_outline_rounded
                                 : Icons.remove_red_eye,
                           ),
@@ -139,7 +137,7 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
                                 ],
                                 IconButton(
                                   onPressed: () {
-                                    inMyBikes
+                                    bike.isMine
                                         ? ref
                                               .read(
                                                 bikeNotifierProvider.notifier,
@@ -154,7 +152,7 @@ class _BikesScreenState extends ConsumerState<BikesScreen> {
                                     Navigator.of(context).pop();
                                   },
                                   icon: Icon(
-                                    inMyBikes
+                                    bike.isMine
                                         ? Icons.remove_circle
                                         : Icons.add_circle,
                                   ),

@@ -9,6 +9,9 @@ abstract class UserDao {
   @Query('SELECT * FROM users WHERE localId = :localId')
   Future<UserEntity?> getUserById(int localId);
 
+  @Query('SELECT * FROM users WHERE remote_id = :remoteId')
+  Future<UserEntity?> getUserByRemoteId(int remoteId);
+
   @insert
   Future<int> createUser(UserEntity user);
 
@@ -20,4 +23,7 @@ abstract class UserDao {
 
   @update
   Future<void> updateUser(UserEntity user);
+
+  @Insert(onConflict: OnConflictStrategy.replace)
+  Future<void> upsertUser(UserEntity user);
 }

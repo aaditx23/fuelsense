@@ -17,7 +17,7 @@ class User {
 
   UserEntity toEntity(String password) {
     return UserEntity(
-      id: id,
+      remoteId: id,
       username: username,
       email: email,
       password: password,
@@ -28,7 +28,7 @@ class User {
 
   factory User.fromEntity(UserEntity entity) {
     return User(
-      id: entity.id,
+      id: entity.remoteId,
       username: entity.username,
       email: entity.email,
       role: entity.role,

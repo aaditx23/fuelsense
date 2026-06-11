@@ -12,13 +12,11 @@ class FetchBikesUseCase {
     if (token == null) throw Exception('No token');
 
     final bikeListResponse = await repository.fetchAllBikes(token);
-    final myBikeResponse = await repository.getMyBikes(token);
 
     return {
       'bikes': bikeListResponse.listData,
       'isSuccess': bikeListResponse.success,
       'message': bikeListResponse.message,
-      'myBikes': myBikeResponse.listData?.map((bike) => bike.id).toList(),
     };
   }
 }

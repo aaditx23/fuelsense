@@ -33,9 +33,9 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
   }
 
   void _loadBikes() {
-    Future.microtask(
-      () => ref.read(pendingBikesNotifierProvider.notifier).pendingBikes(),
-    );
+    Future.microtask(() {
+      ref.read(pendingBikesNotifierProvider.notifier).syncPendingBikes();
+    });
   }
 
   List<Bike> _filterBikes(List<Bike> bikes) {

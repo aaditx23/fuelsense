@@ -27,14 +27,14 @@ import 'package:flutter/cupertino.dart';
 @Entity(
   tableName: "bikes",
   indices: [
-    Index(value: ["id"], unique: true),
+    Index(value: ["remoteId"], unique: true),
   ],
 )
 class BikeEntity {
   @PrimaryKey(autoGenerate: true)
   int? localId;
 
-  final int id;
+  final int remoteId;
   final String brand;
   final String model;
   final int engineCc;
@@ -51,10 +51,12 @@ class BikeEntity {
   final bool isActive;
   final String createdAt;
   final String updatedAt;
+  final bool isMine;
+  final bool isPending;
 
   BikeEntity({
     this.localId,
-    required this.id,
+    required this.remoteId,
     required this.brand,
     required this.model,
     required this.engineCc,
@@ -69,5 +71,49 @@ class BikeEntity {
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
+    required this.isMine,
+    required this.isPending,
   });
+
+  BikeEntity copyWith({
+    int? localId,
+    int? remoteId,
+    String? brand,
+    String? model,
+    int? engineCc,
+    int? modelYear,
+    String? fuelType,
+    double? expectedMileage,
+    double? tankCapacity,
+    double? reserveCapacity,
+    String? image,
+    int? submittedBy,
+    String? adminNote,
+    bool? isActive,
+    String? createdAt,
+    String? updatedAt,
+    bool? isMine,
+    bool? isPending,
+  }) {
+    return BikeEntity(
+      localId: localId ?? this.localId,
+      remoteId: remoteId ?? this.remoteId,
+      brand: brand ?? this.brand,
+      model: model ?? this.model,
+      engineCc: engineCc ?? this.engineCc,
+      modelYear: modelYear ?? this.modelYear,
+      fuelType: fuelType ?? this.fuelType,
+      expectedMileage: expectedMileage ?? this.expectedMileage,
+      tankCapacity: tankCapacity ?? this.tankCapacity,
+      reserveCapacity: reserveCapacity ?? this.reserveCapacity,
+      image: image ?? this.image,
+      submittedBy: submittedBy ?? this.submittedBy,
+      adminNote: adminNote ?? this.adminNote,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isMine: isMine ?? this.isMine,
+      isPending: isPending ?? this.isPending,
+    );
+  }
 }

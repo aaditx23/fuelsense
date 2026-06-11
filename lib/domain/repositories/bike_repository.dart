@@ -16,4 +16,7 @@ abstract class BikeRepository {
   Future<BikeResponse> getPendingBikes(String token);
   Future<AddBikeResponse> approveBike(String token, int bikeId);
   Future<AddBikeResponse> deleteBike(String token, int bikeId);
+  Future<void> syncAllBikes(String token);
+  Future<void> syncMyBikes(String token);
+  Future<void> syncPendingBikes(String token);
 }

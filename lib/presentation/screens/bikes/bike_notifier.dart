@@ -4,6 +4,7 @@ import 'package:fuelsense/domain/usecases/bike/fetch_bikes_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/select_bike_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/remove_bike_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/delete_bike_usecase.dart';
+import 'package:fuelsense/domain/usecases/bike/sync_bikes_usecase.dart';
 import 'package:fuelsense/domain/repositories/preferences_repository.dart';
 import 'bike_state.dart';
 
@@ -12,6 +13,7 @@ class BikeNotifier extends StateNotifier<BikeState> {
   final SelectBikeUseCase _selectBikeUseCase;
   final RemoveBikeUseCase _removeBikeUseCase;
   final DeleteBikeUseCase _deleteBikeUseCase;
+  final SyncBikesUseCase _syncBikesUseCase;
   final PreferencesRepository prefs;
 
   BikeNotifier({
@@ -19,11 +21,13 @@ class BikeNotifier extends StateNotifier<BikeState> {
     required SelectBikeUseCase selectBikeUseCase,
     required RemoveBikeUseCase removeBikeUseCase,
     required DeleteBikeUseCase deleteBikeUseCase,
+    required SyncBikesUseCase syncBikesUseCase,
     required this.prefs,
   }) : _fetchBikesUseCase = fetchBikesUseCase,
        _selectBikeUseCase = selectBikeUseCase,
        _removeBikeUseCase = removeBikeUseCase,
        _deleteBikeUseCase = deleteBikeUseCase,
+       _syncBikesUseCase = syncBikesUseCase,
        super(BikeState());
 
   bool isAdmin() {
@@ -43,7 +47,6 @@ class BikeNotifier extends StateNotifier<BikeState> {
         bikes: result['bikes'],
         isSuccess: result['isSuccess'],
         message: result['message'],
-        myBikes: result['myBikes'],
       );
     } catch (e) {
       print(e.toString());
@@ -55,20 +58,30 @@ class BikeNotifier extends StateNotifier<BikeState> {
     }
   }
 
+  Future<void> syncBikes() async {
+    state = state.copyWith(isLoading: true, message: null);
+    try {
+      await _syncBikesUseCase();
+      // After syncing, fetch the updated data
+      await fetchBikes();
+    } catch (e) {
+      print(e.toString());
+      // If sync fails, still try to load from local storage
+      await fetchBikes();
+    }
+  }
+
   Future<void> selectBike(int bikeId) async {
     state = state.copyWith(isLoading: true, message: null);
     try {
       final response = await _selectBikeUseCase(bikeId);
-      final myBikes = state.myBikes;
       state = state.copyWith(
         isLoading: false,
-        bikes: null,
         isSuccess: response.success,
         message: response.message,
-        myBikes: (myBikes != null && myBikes.isNotEmpty)
-            ? myBikes + [bikeId]
-            : [bikeId],
       );
+      // Refresh the bikes list to get updated isMine flags
+      await fetchBikes();
     } catch (e) {
       print(e.toString());
       state = state.copyWith(
@@ -83,15 +96,13 @@ class BikeNotifier extends StateNotifier<BikeState> {
     state = state.copyWith(isLoading: true, message: null);
     try {
       final response = await _removeBikeUseCase(bikeId);
-      final myBikes = state.myBikes;
-      if (myBikes != null) myBikes.remove(bikeId);
       state = state.copyWith(
         isLoading: false,
-        bikes: null,
         isSuccess: response.success,
         message: response.message,
-        myBikes: myBikes,
       );
+      // Refresh the bikes list to get updated isMine flags
+      await fetchBikes();
     } catch (e) {
       print(e.toString());
       state = state.copyWith(
@@ -106,14 +117,11 @@ class BikeNotifier extends StateNotifier<BikeState> {
     state = state.copyWith(isLoading: true, message: null);
     try {
       final response = await _deleteBikeUseCase(bikeId);
-      final myBikes = state.myBikes;
-      if (myBikes != null) myBikes.remove(bikeId);
       state = state.copyWith(
         isLoading: false,
         bikes: state.bikes.where((bike) => bike.id != bikeId).toList(),
         isSuccess: response.success,
         message: response.message,
-        myBikes: myBikes,
       );
     } catch (e) {
       print(e.toString());
@@ -133,12 +141,14 @@ final bikeNotifierProvider = StateNotifierProvider<BikeNotifier, BikeState>((
   final selectBikeUseCase = getIt<SelectBikeUseCase>();
   final removeBikeUseCase = getIt<RemoveBikeUseCase>();
   final deleteBikeUseCase = getIt<DeleteBikeUseCase>();
+  final syncBikesUseCase = getIt<SyncBikesUseCase>();
   final prefs = getIt<PreferencesRepository>();
   return BikeNotifier(
     fetchBikesUseCase: fetchBikesUseCase,
     selectBikeUseCase: selectBikeUseCase,
     removeBikeUseCase: removeBikeUseCase,
     deleteBikeUseCase: deleteBikeUseCase,
+    syncBikesUseCase: syncBikesUseCase,
     prefs: prefs,
   );
 });

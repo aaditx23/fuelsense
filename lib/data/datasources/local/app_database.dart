@@ -9,7 +9,7 @@ import 'entity/user_entity.dart';
 
 part 'app_database.g.dart';
 
-@Database(version: 1, entities: [UserEntity, BikeEntity])
+@Database(version: 2, entities: [UserEntity, BikeEntity])
 abstract class AppDatabase extends FloorDatabase {
   UserDao get userDao;
   BikeDao get bikeDao;

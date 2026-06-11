@@ -20,6 +20,8 @@ class BikeModel {
   final bool isActive;
   final String createdAt;
   final String updatedAt;
+  final bool isMine;
+  final bool isPending;
 
   BikeModel({
     required this.brand,
@@ -37,6 +39,8 @@ class BikeModel {
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
+    this.isMine = false,
+    this.isPending = false,
   });
 
   factory BikeModel.fromJson(Map<String, dynamic> json) =>
@@ -45,7 +49,7 @@ class BikeModel {
 
   BikeEntity toEntity() {
     return BikeEntity(
-      id: id,
+      remoteId: id,
       brand: brand,
       model: model,
       engineCc: engineCc,
@@ -60,6 +64,8 @@ class BikeModel {
       isActive: isActive,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      isMine: isMine,
+      isPending: isPending,
     );
   }
 }

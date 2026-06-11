@@ -14,6 +14,8 @@ class Bike {
   final bool isActive;
   final String createdAt;
   final String updatedAt;
+  final bool isMine;
+  final bool isPending;
 
   Bike({
     required this.id,
@@ -31,5 +33,7 @@ class Bike {
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
+    required this.isMine,
+    required this.isPending,
   });
 }

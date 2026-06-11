@@ -22,7 +22,7 @@ class _BikesScreenState extends ConsumerState<MyBikesScreen> {
   void initState() {
     super.initState();
     Future.microtask(
-      () => ref.read(myBikesNotifierProvider.notifier).getMyBikes(),
+      () => ref.read(myBikesNotifierProvider.notifier).syncMyBikes(),
     );
   }
 
@@ -78,6 +78,7 @@ class _BikesScreenState extends ConsumerState<MyBikesScreen> {
                     itemCount: filteredBikes.length,
                     itemBuilder: (context, index) {
                       final bike = filteredBikes[index];
+                      print("MY BIKE ${bike.isMine}");
                       return MyBikeCard(
                         bike: bike,
                         onAction: () {

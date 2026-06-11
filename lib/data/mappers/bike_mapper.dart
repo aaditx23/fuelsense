@@ -5,6 +5,7 @@ import 'package:fuelsense/domain/entities/bike/add_bike_response.dart';
 import 'package:fuelsense/domain/entities/bike/bike.dart';
 import 'package:fuelsense/domain/entities/bike/bike_request.dart';
 import 'package:fuelsense/domain/entities/bike/bike_response.dart';
+import 'package:fuelsense/data/datasources/local/entity/bike_entity.dart';
 
 class BikeMapper {
   static data_request.BikeRequest toDataBikeRequest(BikeRequest domain) {
@@ -38,6 +39,30 @@ class BikeMapper {
       isActive: data.isActive,
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
+      isMine: data.isMine,
+      isPending: data.isPending,
+    );
+  }
+
+  static Bike toDomainBikeFromEntity(BikeEntity entity) {
+    return Bike(
+      id: entity.remoteId,
+      brand: entity.brand,
+      model: entity.model,
+      engineCc: entity.engineCc,
+      modelYear: entity.modelYear,
+      fuelType: entity.fuelType,
+      expectedMileage: entity.expectedMileage,
+      tankCapacity: entity.tankCapacity,
+      reserveCapacity: entity.reserveCapacity,
+      image: entity.image,
+      submittedBy: entity.submittedBy,
+      adminNote: entity.adminNote,
+      isActive: entity.isActive,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      isMine: entity.isMine,
+      isPending: entity.isPending,
     );
   }
 
