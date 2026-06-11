@@ -1,3 +1,4 @@
+import 'package:fuelsense/data/local/entity/user_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_response.g.dart';
@@ -24,5 +25,15 @@ class UserResponse {
 
   Map<String, dynamic> toJson() {
     return _$UserResponseToJson(this);
+  }
+
+  UserEntity toEntity(String password){
+    return UserEntity(
+        username: username,
+        email: email,
+        password: password,
+        role: role,
+        profile_image: profile_image
+    );
   }
 }

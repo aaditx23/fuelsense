@@ -7,7 +7,9 @@ Future<void> setupDatabase() async {
       .databaseBuilder('app_database')
       .build();
 
-  getIt.registerSingleton<AppDatabase>(database);
+  getIt.registerSingleton(database);
 
-  getIt.registerSingleton<NameDao>(database.nameDao);
+  getIt.registerSingleton(database.nameDao);
+
+  getIt.registerSingleton(database.userDao);
 }
