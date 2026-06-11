@@ -11,6 +11,7 @@ class OutlinedTextField extends StatelessWidget {
   final Widget? prefixIcon;
   final Widget? suffixIcon;
   final bool obscureText;
+  final ValueChanged<String>? onChanged;
 
   const OutlinedTextField({
     Key? key,
@@ -24,6 +25,7 @@ class OutlinedTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.obscureText = false,
+    this.onChanged,
   }) : super(key: key);
 
   @override
@@ -44,7 +46,7 @@ class OutlinedTextField extends StatelessWidget {
       enabled: enabled,
       maxLength: maxLength,
       obscureText: obscureText,
+      onChanged: onChanged,
     );
   }
 }
-

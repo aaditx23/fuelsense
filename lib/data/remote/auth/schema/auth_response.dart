@@ -9,14 +9,14 @@ class AuthResponse {
   String message;
   int? code;
   UserResponse? data;
-  String? access_token;
+  String? token;
 
   AuthResponse({
     required this.success,
     required this.message,
     this.code,
     this.data,
-    this.access_token,
+    this.token,
   });
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {

@@ -32,8 +32,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
 
         final userId = await userDao.createUser(user);
         prefs.saveUserId(userId);
-        print("USER ID LOGIN NOTIFIER: $userId");
-        if(response.access_token != null) await prefs.saveToken(response.access_token!);
+        if(response.token != null) await prefs.saveToken(response.token!);
       }
       state = state.copyWith(
         isLoading: false,
@@ -41,6 +40,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
         message: response.message,
         code: response.code,
       );
+      print(response.token);
     }
     catch (e){
       state = state.copyWith(

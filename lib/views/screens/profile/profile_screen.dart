@@ -45,7 +45,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             children: [
                               Center(
                                 child: ProfileImageWidget(
-                                  imageUrl: state.user!.profile_image,
+                                  imageUrl: state.user!.profileImage,
                                   radius: 48,
                                 ),
                               ),

@@ -19,14 +19,14 @@ class SignupRequest {
   String username;
   String email;
   String password;
-  String? profile_image;
+  String? profileImage;
   String role = "user";
 
   SignupRequest({
     required this.username,
     required this.email,
     required this.password,
-    this.profile_image,
+    this.profileImage,
     required this.role,
   });
 

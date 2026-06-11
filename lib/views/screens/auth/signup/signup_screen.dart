@@ -66,10 +66,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           username: _nameController.text.trim(),
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
-          profile_image: _profileImage?.trim(),
+          profileImage: _profileImage?.trim(),
           role: _selectedRole,
         );
-        print("ISGNUP REQUEST: ${signupRequest.profile_image}");
+        print("ISGNUP REQUEST: ${signupRequest.profileImage}");
         ref.read(signupNotifier.notifier).signup(signupRequest);
       }
     }

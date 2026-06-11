@@ -1,0 +1,24 @@
+import 'dart:convert';
+import 'package:fuelsense/data/local/dao/bike_dao.dart';
+import 'package:fuelsense/data/remote/bike/schema/bike_response.dart';
+import 'package:fuelsense/data/remote/header.dart';
+import 'package:http/http.dart' as http;
+import 'package:fuelsense/data/remote/bike/schema/bike_model.dart';
+import 'package:http/http.dart' as http;
+
+import '../helper.dart';
+
+class BikeRepository {
+  Future<BikeResponse> fetchAllBikes(String token) async {
+    final response = await http.get(
+        Uri.parse('$baseUrl/bikes/'),
+      headers: authorizedHeader(token)
+    );
+    final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+    print(jsonResponse);
+    final bikeResponse = BikeResponse.fromJson(jsonResponse);
+    print(bikeResponse);
+    return bikeResponse;
+  }
+}
+

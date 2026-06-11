@@ -9,14 +9,14 @@ class UserResponse {
   String username;
   String email;
   String role;
-  String? profile_image;
+  String? profileImage;
 
   UserResponse({
     required this.id,
     required this.username,
     required this.email,
     required this.role,
-    this.profile_image,
+    this.profileImage,
   });
 
   factory UserResponse.fromJson(Map<String, dynamic> json) {
@@ -34,7 +34,7 @@ class UserResponse {
         email: email,
         password: password,
         role: role,
-        profile_image: profile_image
+        profileImage: profileImage
     );
   }
 }

@@ -18,6 +18,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     state = state.copyWith(isLoading: true, message: null, user: null);
     final userId = prefs.getUserId();
     print("USR ID: $userId");
+    print(prefs.getToken());
     if (userId == null) {
       state = state.copyWith(isLoading: false, message: 'User not logged in');
       return;

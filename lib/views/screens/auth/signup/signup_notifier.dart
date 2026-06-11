@@ -29,7 +29,7 @@ class SignupNotifier extends StateNotifier<SignupState> {
         final user = userResponse.toEntity(signupRequest.password);
         final userId = await userDao.createUser(user);
         prefs.saveUserId(userId);
-        if(response.access_token != null) await prefs.saveToken(response.access_token!);
+        if(response.token != null) await prefs.saveToken(response.token!);
 
       }
       state = state.copyWith(

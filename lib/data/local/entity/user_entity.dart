@@ -11,7 +11,7 @@ class UserEntity {
   String email;
   String password;
   String role;
-  String? profile_image;
+  String? profileImage;
 
   UserEntity({
     required this.id,
@@ -19,6 +19,6 @@ class UserEntity {
     required this.email,
     required this.password,
     required this.role,
-    this.profile_image
+    this.profileImage
 });
 }
