@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:template_flutter/views/screens/screen02/screen02_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:template_flutter/views/screens/screen02/screen02_notifier.dart';
+import 'package:template_flutter/views/screens/screen02/screen02_state.dart';
 
-class Screen02 extends StatefulWidget {
+class Screen02 extends ConsumerStatefulWidget {
   const Screen02({super.key});
 
   @override
-  State<Screen02> createState() => _Screen02State();
+  ConsumerState<Screen02> createState() => _Screen02State();
 }
 
-class _Screen02State extends State<Screen02> {
+class _Screen02State extends ConsumerState<Screen02> {
   final TextEditingController _inputController = TextEditingController();
 
   @override
@@ -28,12 +29,11 @@ class _Screen02State extends State<Screen02> {
 
   @override
   Widget build(BuildContext context) {
-    final Screen02Provider provider = context.watch<Screen02Provider>();
-
+    final Screen02State state = ref.watch(screen02Provider);
     void getResult() {
       final int? id = int.tryParse(_inputController.text);
       if (id != null) {
-        provider.getTodo(id);
+        ref.read(screen02Provider.notifier).getTodo(id);
       }
     }
 
@@ -81,14 +81,14 @@ class _Screen02State extends State<Screen02> {
             ),
             SizedBox(height: 12.0),
             Card(
-              child: provider.isLoading
+              child: state.isLoading
                   ? CircularProgressIndicator()
                   : Column(
                       children: [
-                        Text("userID: ${provider.todo?.userId}"),
-                        Text("ID: ${provider.todo?.id}"),
-                        Text("Title: ${provider.todo?.title}"),
-                        Text("Completed?: ${provider.todo?.completed}"),
+                        Text("userID: ${state.todo?.userId}"),
+                        Text("ID: ${state.todo?.id}"),
+                        Text("Title: ${state.todo?.title}"),
+                        Text("Completed?: ${state.todo?.completed}"),
                       ],
                     ),
             ),

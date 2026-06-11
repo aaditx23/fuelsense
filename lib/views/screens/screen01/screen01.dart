@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:template_flutter/views/screens/screen01/screen01_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:template_flutter/views/screens/screen01/screen01_notifier.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class Screen01 extends StatefulWidget {
+class Screen01 extends ConsumerStatefulWidget {
   const Screen01({super.key});
 
   @override
-  State<Screen01> createState() => _Screen01State();
+  ConsumerState<Screen01> createState() => _Screen01State();
 }
 
-class _Screen01State extends State<Screen01> {
+class _Screen01State extends ConsumerState<Screen01> {
   final TextEditingController _inputController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<Screen01Provider>().getAllNames();
+      ref.read(screen01Provider.notifier).getAllNames();
     });
     _inputController.addListener(() {
       setState(() {});
@@ -31,10 +31,10 @@ class _Screen01State extends State<Screen01> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<Screen01Provider>();
+    final namesList = ref.watch(screen01Provider);
 
     void saveText() {
-      provider.insertName(_inputController.text);
+      ref.read(screen01Provider.notifier).insertName(_inputController.text);
     }
 
     return Scaffold(
@@ -81,9 +81,9 @@ class _Screen01State extends State<Screen01> {
           Text("Floor Databse"),
           Expanded(
             child: ListView.builder(
-              itemCount: provider.namesList.length,
+              itemCount: namesList.length,
               itemBuilder: (context, index) {
-                final name = provider.namesList[index];
+                final name = namesList[index];
                 final id = name.id ?? 0;
                 return Padding(
                   padding: const EdgeInsets.only(
