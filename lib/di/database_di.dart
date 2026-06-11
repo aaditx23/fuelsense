@@ -13,4 +13,8 @@ Future<void> setupDatabase() async {
   getIt.registerSingleton(database.bikeDao);
 
   getIt.registerSingleton(database.pendingOperationDao);
+
+  getIt.registerSingleton(database.refuelDao);
+
+  getIt.registerSingleton(database.reserveCycleDao);
 }

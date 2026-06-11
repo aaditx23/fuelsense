@@ -105,7 +105,9 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
                                       onPressed: () {
                                         Navigator.of(context).pop();
                                       },
-                                      icon: Icon(Icons.arrow_back_ios),
+                                      icon: Icon(
+                                        Icons.arrow_back_ios_new_rounded,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -140,7 +142,7 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
                                         .approveBike(bike.id);
                                     Navigator.of(context).pop();
                                   },
-                                  icon: Icon(Icons.approval_rounded),
+                                  icon: Icon(Icons.save_rounded),
                                 ),
                               ],
                             ),

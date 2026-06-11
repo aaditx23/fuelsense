@@ -1,0 +1,269 @@
+import 'package:flutter_riverpod/legacy.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart' show FutureProvider;
+import 'package:fuelsense/domain/entities/refuel.dart';
+import 'package:fuelsense/domain/usecases/refuel_usecases.dart';
+import 'package:fuelsense/domain/repositories/refuel_repository.dart';
+import 'package:fuelsense/di/setup_di.dart';
+
+enum CreateRefuelType { reserveHit, refuel, topup }
+
+class CreateRefuelState {
+  final bool isLoading;
+  final String? error;
+  final String? successMessage;
+  final CreateRefuelType refuelType;
+  final Refuel? incompleteEntry; // Track incomplete reserve entry
+
+  // Form fields
+  final double? tripMeterReading;
+  final double? odometerReading;
+  final double? fuelLiter;
+  final double? fuelPrice;
+
+  CreateRefuelState({
+    this.isLoading = false,
+    this.error,
+    this.successMessage,
+    this.refuelType = CreateRefuelType.reserveHit,
+    this.incompleteEntry,
+    this.tripMeterReading,
+    this.odometerReading,
+    this.fuelLiter,
+    this.fuelPrice,
+  });
+
+  CreateRefuelState copyWith({
+    bool? isLoading,
+    String? error,
+    String? successMessage,
+    CreateRefuelType? refuelType,
+    Refuel? incompleteEntry,
+    double? tripMeterReading,
+    double? odometerReading,
+    double? fuelLiter,
+    double? fuelPrice,
+    bool clearIncomplete = false,
+    bool clearTripMeter = false,
+    bool clearOdometer = false,
+    bool clearFuelLiter = false,
+    bool clearFuelPrice = false,
+  }) {
+    return CreateRefuelState(
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
+      successMessage: successMessage,
+      refuelType: refuelType ?? this.refuelType,
+      incompleteEntry: clearIncomplete
+          ? null
+          : (incompleteEntry ?? this.incompleteEntry),
+      tripMeterReading: clearTripMeter
+          ? null
+          : (tripMeterReading ?? this.tripMeterReading),
+      odometerReading: clearOdometer
+          ? null
+          : (odometerReading ?? this.odometerReading),
+      fuelLiter: clearFuelLiter ? null : (fuelLiter ?? this.fuelLiter),
+      fuelPrice: clearFuelPrice ? null : (fuelPrice ?? this.fuelPrice),
+    );
+  }
+
+  bool get hasIncompleteEntry => incompleteEntry != null;
+
+  bool get isFormValid {
+    if (hasIncompleteEntry) {
+      // Must complete the incomplete entry
+      return (tripMeterReading != null || odometerReading != null) &&
+          fuelLiter != null &&
+          fuelPrice != null;
+    }
+
+    switch (refuelType) {
+      case CreateRefuelType.reserveHit:
+        return tripMeterReading != null || odometerReading != null;
+      case CreateRefuelType.refuel:
+        return (tripMeterReading != null || odometerReading != null) &&
+            fuelLiter != null &&
+            fuelPrice != null;
+      case CreateRefuelType.topup:
+        return (tripMeterReading != null || odometerReading != null) &&
+            fuelLiter != null &&
+            fuelPrice != null;
+    }
+  }
+}
+
+class CreateRefuelNotifier extends StateNotifier<CreateRefuelState> {
+  final CreateReserveEntryUseCase _createReserveEntryUseCase;
+  final CompleteReserveEntryUseCase _completeReserveEntryUseCase;
+  final CreateTopupEntryUseCase _createTopupEntryUseCase;
+  final RefuelRepository _refuelRepository;
+
+  CreateRefuelNotifier(
+    this._createReserveEntryUseCase,
+    this._completeReserveEntryUseCase,
+    this._createTopupEntryUseCase,
+    this._refuelRepository,
+  ) : super(CreateRefuelState());
+
+  Future<void> checkIncompleteEntry(int userBikeId) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final incomplete = await _refuelRepository.getIncompleteReserveEntry(
+        userBikeId,
+      );
+      if (incomplete != null) {
+        // Load the incomplete entry data
+        state = state.copyWith(
+          isLoading: false,
+          incompleteEntry: incomplete,
+          refuelType: CreateRefuelType.refuel,
+          tripMeterReading: incomplete.tripMeterAtReserve,
+          odometerReading: incomplete.odometerAtReserve,
+        );
+      } else {
+        state = state.copyWith(isLoading: false);
+      }
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  void updateRefuelType(CreateRefuelType type) {
+    if (!state.hasIncompleteEntry) {
+      state = state.copyWith(
+        refuelType: type,
+        error: null,
+        successMessage: null,
+      );
+    }
+  }
+
+  void updateTripMeterReading(double? value) {
+    state = state.copyWith(
+      tripMeterReading: value,
+      clearTripMeter: value == null,
+    );
+  }
+
+  void updateOdometerReading(double? value) {
+    state = state.copyWith(
+      odometerReading: value,
+      clearOdometer: value == null,
+    );
+  }
+
+  void updateFuelLiter(double? value) {
+    state = state.copyWith(fuelLiter: value, clearFuelLiter: value == null);
+  }
+
+  void updateFuelPrice(double? value) {
+    state = state.copyWith(fuelPrice: value, clearFuelPrice: value == null);
+  }
+
+  Future<bool> submitEntry(int userId, int userBikeId) async {
+    if (!state.isFormValid) {
+      state = state.copyWith(error: 'Please fill in all required fields');
+      return false;
+    }
+
+    state = state.copyWith(isLoading: true, error: null, successMessage: null);
+
+    try {
+      if (state.hasIncompleteEntry) {
+        // Complete the incomplete entry
+        await _completeReserveEntryUseCase.execute(
+          localId: state.incompleteEntry!.localId!,
+          tripMeterReading: state.tripMeterReading,
+          odometerReading: state.odometerReading,
+          fuelLiter: state.fuelLiter!,
+          fuelPrice: state.fuelPrice!,
+        );
+      } else {
+        switch (state.refuelType) {
+          case CreateRefuelType.reserveHit:
+            await _createReserveEntryUseCase.execute(
+              userId: userId,
+              userBikeId: userBikeId,
+              tripMeterAtReserve: state.tripMeterReading,
+              odometerAtReserve: state.odometerReading,
+            );
+            break;
+
+          case CreateRefuelType.refuel:
+            await _completeReserveEntryUseCase.execute(
+              localId: 0, // This will be ignored by the use case
+              tripMeterReading: state.tripMeterReading,
+              odometerReading: state.odometerReading,
+              fuelLiter: state.fuelLiter!,
+              fuelPrice: state.fuelPrice!,
+            );
+            break;
+
+          case CreateRefuelType.topup:
+            await _createTopupEntryUseCase.execute(
+              userId: userId,
+              userBikeId: userBikeId,
+              tripMeterReading: state.tripMeterReading,
+              odometerReading: state.odometerReading,
+              fuelLiter: state.fuelLiter!,
+              fuelPrice: state.fuelPrice!,
+            );
+            break;
+        }
+      }
+
+      state = state.copyWith(
+        isLoading: false,
+        successMessage: 'Entry saved successfully',
+        clearIncomplete: true,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      return false;
+    }
+  }
+
+  void reset() {
+    state = CreateRefuelState();
+  }
+}
+
+final createRefuelNotifierProvider =
+    StateNotifierProvider.autoDispose<CreateRefuelNotifier, CreateRefuelState>((
+      ref,
+    ) {
+      return CreateRefuelNotifier(
+        getIt<CreateReserveEntryUseCase>(),
+        getIt<CompleteReserveEntryUseCase>(),
+        getIt<CreateTopupEntryUseCase>(),
+        getIt<RefuelRepository>(),
+      );
+    });
+
+// Provider to get the last odometer reading for validation
+final lastOdometerReadingProvider = FutureProvider.autoDispose
+    .family<double?, int>((ref, userBikeId) async {
+      final repository = getIt<RefuelRepository>();
+      final refuels = await repository.getRefuelsByBikeId(userBikeId);
+
+      // Find the most recent entry with an odometer reading
+      for (final refuel in refuels) {
+        if (refuel.odometerReading != null) {
+          return refuel.odometerReading;
+        }
+        if (refuel.odometerAtReserve != null) {
+          return refuel.odometerAtReserve;
+        }
+      }
+      return null;
+    });
+
+// Provider to check if this is the first refuel entry
+final isFirstRefuelEntryProvider = FutureProvider.autoDispose.family<bool, int>(
+  (ref, userBikeId) async {
+    final repository = getIt<RefuelRepository>();
+    final refuels = await repository.getRefuelsByBikeId(userBikeId);
+    return refuels.isEmpty;
+  },
+);

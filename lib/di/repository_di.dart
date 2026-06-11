@@ -1,15 +1,20 @@
 import 'package:fuelsense/data/datasources/remote/auth/auth_api_service.dart';
 import 'package:fuelsense/data/datasources/remote/bike/bike_api_service.dart';
-import 'package:fuelsense/data/repositories/auth_repository.dart';
-import 'package:fuelsense/data/repositories/bike_repository.dart';
+import 'package:fuelsense/data/repositories/auth_repository_impl.dart';
+import 'package:fuelsense/data/repositories/bike_repository_impl.dart';
 import 'package:fuelsense/data/repositories/preferences_repository_impl.dart';
-import 'package:fuelsense/data/repositories/profile_repository.dart'
+import 'package:fuelsense/data/repositories/profile_repository_impl.dart'
     as data_profile;
+import 'package:fuelsense/data/repositories/refuel_repository_impl.dart';
+import 'package:fuelsense/data/repositories/reserve_cycle_repository_impl.dart';
 import 'package:fuelsense/domain/repositories/auth_repository.dart';
 import 'package:fuelsense/domain/repositories/bike_repository.dart';
 import 'package:fuelsense/domain/repositories/preferences_repository.dart';
 import 'package:fuelsense/domain/repositories/profile_repository.dart'
     as domain_profile;
+import 'package:fuelsense/domain/repositories/refuel_repository.dart';
+import 'package:fuelsense/domain/repositories/reserve_cycle_repository.dart';
+import 'package:fuelsense/domain/usecases/refuel_usecases.dart';
 import 'package:fuelsense/domain/usecases/auth/login_usecase.dart';
 import 'package:fuelsense/domain/usecases/auth/signup_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/fetch_bikes_usecase.dart';
@@ -69,6 +74,12 @@ void setupRepositories() {
   );
   getIt.registerLazySingleton<domain_profile.ProfileRepository>(
     () => data_profile.ProfileRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<RefuelRepository>(
+    () => RefuelRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<ReserveCycleRepository>(
+    () => ReserveCycleRepositoryImpl(getIt()),
   );
 
   getIt.registerLazySingleton(
@@ -164,7 +175,45 @@ void setupRepositories() {
     ),
   );
   getIt.registerLazySingleton(
-    () => GetProfileUseCase(getIt(), getIt<PreferencesRepository>()),
+    () => GetProfileUseCase(
+      getIt<domain_profile.ProfileRepository>(),
+      getIt<PreferencesRepository>(),
+    ),
+  );
+
+  // Refuel use cases
+  getIt.registerLazySingleton(
+    () => CreateReserveEntryUseCase(
+      getIt<RefuelRepository>(),
+      getIt<ReserveCycleRepository>(),
+    ),
+  );
+  getIt.registerLazySingleton(
+    () => CompleteReserveEntryUseCase(
+      getIt<RefuelRepository>(),
+      getIt<ReserveCycleRepository>(),
+    ),
+  );
+  getIt.registerLazySingleton(
+    () => CreateTopupEntryUseCase(
+      getIt<RefuelRepository>(),
+      getIt<ReserveCycleRepository>(),
+    ),
+  );
+  getIt.registerLazySingleton(
+    () => GetRefuelHistoryUseCase(getIt<RefuelRepository>()),
+  );
+  getIt.registerLazySingleton(
+    () => DeleteRefuelUseCase(getIt<RefuelRepository>()),
+  );
+  getIt.registerLazySingleton(
+    () => GetFuelMetricsUseCase(getIt<RefuelRepository>()),
+  );
+  getIt.registerLazySingleton(
+    () => GetCurrentCycleInfoUseCase(
+      getIt<ReserveCycleRepository>(),
+      getIt<RefuelRepository>(),
+    ),
   );
 
   // Register operation handlers with SyncManager

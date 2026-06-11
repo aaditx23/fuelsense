@@ -14,13 +14,15 @@ class ProfileRepositoryImpl implements domain_profile.ProfileRepository {
   ProfileRepositoryImpl(this.userDao);
 
   @override
-  Future<User?> getProfile(String token) async {
-    // This would call the API to get profile, but for now we'll just return from local
-    // In a real implementation, this might call /auth/me or /user/profile
+  Stream<User?> getProfile(String token) async* {
     final userId = await _getCurrentUserId();
-    if (userId == null) return null;
-    final userEntity = await userDao.getUserById(userId);
-    return userEntity != null ? User.fromEntity(userEntity) : null;
+    if (userId == null) {
+      yield null;
+      return;
+    }
+    await for (final userEntity in userDao.getUserById(userId)) {
+      yield userEntity != null ? User.fromEntity(userEntity) : null;
+    }
   }
 
   @override

@@ -7,7 +7,7 @@ abstract class UserDao {
   Future<List<UserEntity>> getAllUsers();
 
   @Query('SELECT * FROM users WHERE localId = :localId')
-  Future<UserEntity?> getUserById(int localId);
+  Stream<UserEntity?> getUserById(int localId);
 
   @Query('SELECT * FROM users WHERE remote_id = :remoteId')
   Future<UserEntity?> getUserByRemoteId(int remoteId);

@@ -19,18 +19,22 @@ class CommonScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        surfaceTintColor: Colors.transparent,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        title: title != null ? Text(title!) : null,
-        actions: actions,
-        centerTitle: true,
+    return SafeArea(
+      top: false,
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: title != null ? Text(title!) : null,
+          actions: actions,
+          centerTitle: true,
+        ),
+        drawer: showDrawer ? const NavDrawer() : null,
+        body: body,
+      
+        floatingActionButton: fab,
       ),
-      drawer: showDrawer ? const NavDrawer() : null,
-      body: body,
-
-      floatingActionButton: fab,
     );
   }
 }

@@ -9,6 +9,9 @@ import 'package:fuelsense/presentation/screens/edit/bike_edit_screen.dart';
 import 'package:fuelsense/presentation/screens/pending_bikes/pending_bike_screen.dart';
 import 'package:fuelsense/presentation/screens/pending_operations/pending_operations_screen.dart';
 import 'package:fuelsense/presentation/screens/profile/profile_screen.dart';
+import 'package:fuelsense/presentation/screens/refuel_dashboard/refuel_dashboard_screen.dart';
+import 'package:fuelsense/presentation/screens/create_refuel/create_refuel_screen.dart';
+import 'package:fuelsense/presentation/screens/refuel_list/refuel_list_screen.dart';
 
 import '../di/setup_di.dart';
 import '../presentation/screens/bikes/bikes_screen.dart';
@@ -27,6 +30,9 @@ Map<String, WidgetBuilder> getRoute(context) {
       final bike = ModalRoute.of(context)!.settings.arguments as Bike;
       return EditBikeScreen(bike: bike);
     },
+    "/refuel_dashboard": (context) => const RefuelDashboardScreen(),
+    "/create_refuel": (context) => const CreateRefuelScreen(),
+    "/refuel_list": (context) => const RefuelListScreen(),
   };
 }
 

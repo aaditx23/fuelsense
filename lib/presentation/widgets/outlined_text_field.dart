@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class OutlinedTextField extends StatelessWidget {
-  final TextEditingController controller;
+  final TextEditingController? controller;
+  final String? initialValue;
   final String? labelText;
   final String? hintText;
+  final String? errorText;
   final String? Function(String?)? validator;
   final TextInputType? keyboardType;
   final bool enabled;
@@ -12,12 +15,15 @@ class OutlinedTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final bool obscureText;
   final ValueChanged<String>? onChanged;
+  final List<TextInputFormatter>? inputFormatters;
 
   const OutlinedTextField({
     Key? key,
-    required this.controller,
+    this.controller,
+    this.initialValue,
     this.labelText,
     this.hintText,
+    this.errorText,
     this.validator,
     this.keyboardType,
     this.enabled = true,
@@ -26,18 +32,23 @@ class OutlinedTextField extends StatelessWidget {
     this.suffixIcon,
     this.obscureText = false,
     this.onChanged,
-  }) : super(key: key);
+    this.inputFormatters,
+  }) : assert(
+         controller == null || initialValue == null,
+         'controller and initialValue cannot both be set',
+       ),
+       super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      initialValue: initialValue,
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        errorText: errorText,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
       ),
@@ -47,6 +58,7 @@ class OutlinedTextField extends StatelessWidget {
       maxLength: maxLength,
       obscureText: obscureText,
       onChanged: onChanged,
+      inputFormatters: inputFormatters,
     );
   }
 }
