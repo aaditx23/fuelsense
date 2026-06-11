@@ -1,30 +1,30 @@
 import 'package:fuelsense/data/remote/bike/schema/bike_model.dart';
+import 'package:fuelsense/data/remote/schema/base_response.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'bike_response.g.dart';
 
 @JsonSerializable()
-class BikeResponse {
-  final bool success;
-  final String message;
-  final List<BikeModel>? data;
+class BikeResponse extends BaseResponse {
+  final List<BikeModel>? listData;
 
-  BikeResponse({required this.success, required this.message, this.data});
+  BikeResponse({required super.success, required super.message, this.listData});
 
   factory BikeResponse.fromJson(Map<String, dynamic> json) =>
       _$BikeResponseFromJson(json);
+  @override
   Map<String, dynamic> toJson() => _$BikeResponseToJson(this);
 }
 
 @JsonSerializable()
-class AddBikeResponse {
-  final bool success;
-  final String message;
+class AddBikeResponse extends BaseResponse {
   final BikeModel? data;
 
-  AddBikeResponse({required this.success, required this.message, this.data});
+  AddBikeResponse({required super.success, required super.message, this.data});
 
   factory AddBikeResponse.fromJson(Map<String, dynamic> json) =>
       _$AddBikeResponseFromJson(json);
+
+  @override
   Map<String, dynamic> toJson() => _$AddBikeResponseToJson(this);
 }

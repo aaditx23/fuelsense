@@ -27,14 +27,14 @@ class UserResponse {
     return _$UserResponseToJson(this);
   }
 
-  UserEntity toEntity(String password){
+  UserEntity toEntity(String password) {
     return UserEntity(
-        id: id,
-        username: username,
-        email: email,
-        password: password,
-        role: role,
-        profileImage: profileImage
+      id: id,
+      username: username,
+      email: email,
+      password: password,
+      role: role,
+      profileImage: profileImage,
     );
   }
 }

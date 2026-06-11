@@ -34,7 +34,7 @@ class PendingBikesNotifier extends StateNotifier<PendingBikeState> {
         isLoading: false,
         isSuccess: response.success,
         message: response.message,
-        pendingBikes: response.data,
+        pendingBikes: response.listData,
       );
     } catch (e) {
       state = state.copyWith(

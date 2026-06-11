@@ -34,10 +34,10 @@ class BikeNotifier extends StateNotifier<BikeState> {
       final myBikeResponse = await repository.getMyBikes(token);
       state = state.copyWith(
         isLoading: false,
-        bikes: bikeListResponse.data,
+        bikes: bikeListResponse.listData,
         isSuccess: bikeListResponse.success,
         message: bikeListResponse.message,
-        myBikes: myBikeResponse.data?.map((bike) => bike.id).toList(),
+        myBikes: myBikeResponse.listData?.map((bike) => bike.id).toList(),
       );
     } catch (e) {
       print(e.toString());

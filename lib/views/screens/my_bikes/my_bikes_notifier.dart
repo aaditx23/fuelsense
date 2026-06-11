@@ -28,7 +28,7 @@ class MyBikeNotifier extends StateNotifier<MyBikeState> {
         isLoading: false,
         isSuccess: response.success,
         message: response.message,
-        myBikes: response.data,
+        myBikes: response.listData,
       );
     } catch (e) {
       state = state.copyWith(
