@@ -10,7 +10,7 @@ import 'package:fuelsense/presentation/widgets/dropdown_widget.dart';
 import 'package:fuelsense/presentation/widgets/image_picker/pick_image.dart';
 import 'package:fuelsense/presentation/widgets/outlined_text_field.dart';
 
-import '../../data/dropdown_values/fuel_type.dart';
+import '../../../data/dropdown_values/fuel_type.dart';
 
 /*
 response message: show as toast on top

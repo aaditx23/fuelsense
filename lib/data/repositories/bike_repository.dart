@@ -1,18 +1,23 @@
+import 'dart:convert';
 import 'package:fuelsense/data/datasources/local/entity/bike_entity.dart';
 import 'package:fuelsense/data/datasources/remote/bike/bike_api_service.dart';
 import 'package:fuelsense/data/mappers/bike_mapper.dart';
+import 'package:fuelsense/data/models/base_response.dart';
 import 'package:fuelsense/domain/entities/bike/add_bike_response.dart';
 import 'package:fuelsense/domain/entities/bike/bike_request.dart';
 import 'package:fuelsense/domain/entities/bike/bike_response.dart';
 import 'package:fuelsense/data/datasources/local/dao/bike_dao.dart';
+import 'package:fuelsense/data/services/sync_manager.dart';
+import 'package:fuelsense/data/datasources/local/entity/pending_operation_entity.dart';
 
 import '../../domain/repositories/bike_repository.dart';
 
 class BikeRepositoryImpl implements BikeRepository {
   final BikeDao bikeDao;
   final BikeApiService bikeApiService;
+  final SyncManager syncManager;
 
-  BikeRepositoryImpl(this.bikeDao, this.bikeApiService);
+  BikeRepositoryImpl(this.bikeDao, this.bikeApiService, this.syncManager);
 
   // Helper method to upsert bikes (insert or update based on remoteId)
   Future<void> _upsertBikes(
@@ -39,6 +44,7 @@ class BikeRepositoryImpl implements BikeRepository {
   }
 
   // Sync methods - fetch from API and store in local DB
+  @override
   Future<void> syncAllBikes(String token) async {
     try {
       final bikeResponse = await bikeApiService.syncAllBikes(token);
@@ -47,22 +53,8 @@ class BikeRepositoryImpl implements BikeRepository {
       final entities =
           bikeResponse.listData
               ?.map(
-                (bike) => BikeEntity(
-                  remoteId: bike.id,
-                  brand: bike.brand,
-                  model: bike.model,
-                  engineCc: bike.engineCc,
-                  modelYear: bike.modelYear,
-                  fuelType: bike.fuelType,
-                  expectedMileage: bike.expectedMileage,
-                  tankCapacity: bike.tankCapacity,
-                  reserveCapacity: bike.reserveCapacity,
-                  image: bike.image,
-                  submittedBy: bike.submittedBy,
-                  adminNote: bike.adminNote,
-                  isActive: bike.isActive,
-                  createdAt: bike.createdAt,
-                  updatedAt: bike.updatedAt,
+                (bike) => BikeMapper.toEntityFromDataModel(
+                  bike,
                   isMine: false,
                   isPending: false,
                 ),
@@ -79,6 +71,7 @@ class BikeRepositoryImpl implements BikeRepository {
     }
   }
 
+  @override
   Future<void> syncMyBikes(String token) async {
     try {
       final bikeResponse = await bikeApiService.syncMyBikes(token);
@@ -87,22 +80,8 @@ class BikeRepositoryImpl implements BikeRepository {
       final entities =
           bikeResponse.listData
               ?.map(
-                (bike) => BikeEntity(
-                  remoteId: bike.id,
-                  brand: bike.brand,
-                  model: bike.model,
-                  engineCc: bike.engineCc,
-                  modelYear: bike.modelYear,
-                  fuelType: bike.fuelType,
-                  expectedMileage: bike.expectedMileage,
-                  tankCapacity: bike.tankCapacity,
-                  reserveCapacity: bike.reserveCapacity,
-                  image: bike.image,
-                  submittedBy: bike.submittedBy,
-                  adminNote: bike.adminNote,
-                  isActive: bike.isActive,
-                  createdAt: bike.createdAt,
-                  updatedAt: bike.updatedAt,
+                (bike) => BikeMapper.toEntityFromDataModel(
+                  bike,
                   isMine: true,
                   isPending: false,
                 ),
@@ -119,30 +98,20 @@ class BikeRepositoryImpl implements BikeRepository {
     }
   }
 
+  @override
   Future<void> syncPendingBikes(String token) async {
     try {
+      // Process any pending operations first (e.g. deletes) before re-fetching
+      await syncManager.processPendingOperations();
+
       final bikeResponse = await bikeApiService.syncPendingBikes(token);
 
       // Convert to entities with isMine=false, isPending=true
       final entities =
           bikeResponse.listData
               ?.map(
-                (bike) => BikeEntity(
-                  remoteId: bike.id,
-                  brand: bike.brand,
-                  model: bike.model,
-                  engineCc: bike.engineCc,
-                  modelYear: bike.modelYear,
-                  fuelType: bike.fuelType,
-                  expectedMileage: bike.expectedMileage,
-                  tankCapacity: bike.tankCapacity,
-                  reserveCapacity: bike.reserveCapacity,
-                  image: bike.image,
-                  submittedBy: bike.submittedBy,
-                  adminNote: bike.adminNote,
-                  isActive: bike.isActive,
-                  createdAt: bike.createdAt,
-                  updatedAt: bike.updatedAt,
+                (bike) => BikeMapper.toEntityFromDataModel(
+                  bike,
                   isMine: false,
                   isPending: true,
                 ),
@@ -160,6 +129,7 @@ class BikeRepositoryImpl implements BikeRepository {
   }
 
   // Read methods - get from local DB
+  @override
   Future<BikeResponse> fetchAllBikes(String token) async {
     try {
       final entities = await bikeDao.getAllAvailableBikes();
@@ -178,21 +148,33 @@ class BikeRepositoryImpl implements BikeRepository {
     }
   }
 
+  @override
   Future<BikeResponse> selectBike(String token, int bikeId) async {
-    final bikeResponse = await bikeApiService.selectBike(token, bikeId);
-
-    // Update local database flags after successful API call
-    if (bikeResponse.success == true) {
-      final existing = await bikeDao.getBikeByRemoteId(bikeId);
-      if (existing != null) {
-        final updatedEntity = existing.copyWith(isMine: true, isPending: false);
-        await bikeDao.updateBike(updatedEntity);
-      }
+    // Perform optimistic local DB change
+    final existing = await bikeDao.getBikeByRemoteId(bikeId);
+    if (existing != null) {
+      final updatedEntity = existing.copyWith(isMine: true, isPending: false);
+      await bikeDao.updateBike(updatedEntity);
     }
 
-    return BikeMapper.toDomainBikeResponse(bikeResponse);
+    // Enqueue pending operation
+    final operation = PendingOperationEntity(
+      entityType: 'bike',
+      operationType: 'selectBike',
+      entityId: bikeId,
+      createdAt: DateTime.now().toIso8601String(),
+    );
+    await syncManager.enqueueOperation(operation);
+
+    // Return success immediately
+    return BikeResponse(
+      success: true,
+      message: 'Bike selected successfully',
+      listData: [],
+    );
   }
 
+  @override
   Future<BikeResponse> getMyBikes(String token) async {
     try {
       final entities = await bikeDao.getMyBikes();
@@ -212,40 +194,127 @@ class BikeRepositoryImpl implements BikeRepository {
     }
   }
 
+  @override
   Future<BikeResponse> removeMyBike(String token, int bikeId) async {
-    final bikeResponse = await bikeApiService.removeMyBike(token, bikeId);
-
-    // Update local database flags after successful API call
-    if (bikeResponse.success == true) {
-      final existing = await bikeDao.getBikeByRemoteId(bikeId);
-      if (existing != null) {
-        final updatedEntity = existing.copyWith(isMine: false);
-        await bikeDao.updateBike(updatedEntity);
-      }
+    // Perform optimistic local DB change
+    final existing = await bikeDao.getBikeByRemoteId(bikeId);
+    if (existing != null) {
+      final updatedEntity = existing.copyWith(isMine: false);
+      await bikeDao.updateBike(updatedEntity);
     }
 
-    return BikeMapper.toDomainBikeResponse(bikeResponse);
+    // Enqueue pending operation
+    final operation = PendingOperationEntity(
+      entityType: 'bike',
+      operationType: 'removeBike',
+      entityId: bikeId,
+      createdAt: DateTime.now().toIso8601String(),
+    );
+    await syncManager.enqueueOperation(operation);
+
+    // Return success immediately
+    return BikeResponse(
+      success: true,
+      message: 'Bike removed successfully',
+      listData: [],
+    );
   }
 
+  @override
   Future<AddBikeResponse> submitBike(
     String token,
     BikeRequest bikeRequest,
   ) async {
     final dataReq = BikeMapper.toDataBikeRequest(bikeRequest);
-    final bikeResponse = await bikeApiService.submitBike(token, dataReq);
-    return BikeMapper.toDomainAddBikeResponse(bikeResponse);
+
+    // Create local entity with temporary remoteId (-1)
+    final localEntity = BikeEntity(
+      remoteId: -1, // Temporary ID until server assigns real one
+      brand: dataReq.brand,
+      model: dataReq.model,
+      engineCc: dataReq.engineCc,
+      modelYear: dataReq.modelYear,
+      fuelType: dataReq.fuelType,
+      expectedMileage: dataReq.expectedMileage,
+      tankCapacity: dataReq.tankCapacity,
+      reserveCapacity: dataReq.reserveCapacity,
+      image: dataReq.image,
+      isActive: true,
+      createdAt: DateTime.now().toIso8601String(),
+      updatedAt: DateTime.now().toIso8601String(),
+      isMine: false,
+      isPending: true,
+    );
+
+    final localId = await bikeDao.insertBike(localEntity);
+
+    // Enqueue pending operation
+    final operation = PendingOperationEntity(
+      entityType: 'bike',
+      operationType: 'submitBike',
+      localEntityId: localId,
+      payload: jsonEncode(dataReq.toJson()),
+      createdAt: DateTime.now().toIso8601String(),
+    );
+    await syncManager.enqueueOperation(operation);
+
+    // Return success immediately with the local entity
+    final domainBike = BikeMapper.toDomainBikeFromEntity(
+      localEntity.copyWith(localId: localId),
+    );
+    return AddBikeResponse(
+      success: true,
+      message: 'Bike submitted successfully',
+    );
   }
 
+  @override
   Future<AddBikeResponse> editBike(
     String token,
     BikeRequest bikeRequest,
     int id,
   ) async {
     final dataReq = BikeMapper.toDataBikeRequest(bikeRequest);
-    final bikeResponse = await bikeApiService.editBike(token, dataReq, id);
-    return BikeMapper.toDomainAddBikeResponse(bikeResponse);
+
+    // Perform optimistic local DB update
+    final existing = await bikeDao.getBikeByRemoteId(id);
+    if (existing != null) {
+      final updatedEntity = existing.copyWith(
+        brand: dataReq.brand,
+        model: dataReq.model,
+        engineCc: dataReq.engineCc,
+        modelYear: dataReq.modelYear,
+        fuelType: dataReq.fuelType,
+        expectedMileage: dataReq.expectedMileage,
+        tankCapacity: dataReq.tankCapacity,
+        reserveCapacity: dataReq.reserveCapacity,
+        image: dataReq.image,
+        updatedAt: DateTime.now().toIso8601String(),
+      );
+      await bikeDao.updateBike(updatedEntity);
+    }
+
+    // Enqueue pending operation
+    final operation = PendingOperationEntity(
+      entityType: 'bike',
+      operationType: 'editBike',
+      entityId: id,
+      payload: jsonEncode(dataReq.toJson()),
+      createdAt: DateTime.now().toIso8601String(),
+    );
+    await syncManager.enqueueOperation(operation);
+
+    // Return success immediately
+    return AddBikeResponse(
+      success: true,
+      message: 'Bike updated successfully',
+      data: existing != null
+          ? BikeMapper.toDomainBikeFromEntity(existing)
+          : null,
+    );
   }
 
+  @override
   Future<BikeResponse> getPendingBikes(String token) async {
     try {
       final entities = await bikeDao.getPendingBikes();
@@ -265,29 +334,55 @@ class BikeRepositoryImpl implements BikeRepository {
     }
   }
 
+  @override
   Future<AddBikeResponse> approveBike(String token, int bikeId) async {
-    final bikeResponse = await bikeApiService.approveBike(token, bikeId);
-
-    // Update local database flags after successful API call
-    if (bikeResponse.success == true) {
-      final existing = await bikeDao.getBikeByRemoteId(bikeId);
-      if (existing != null) {
-        final updatedEntity = existing.copyWith(isPending: false);
-        await bikeDao.updateBike(updatedEntity);
-      }
+    // Perform optimistic local DB change
+    final existing = await bikeDao.getBikeByRemoteId(bikeId);
+    if (existing != null) {
+      final updatedEntity = existing.copyWith(isPending: false);
+      await bikeDao.updateBike(updatedEntity);
     }
 
-    return BikeMapper.toDomainAddBikeResponse(bikeResponse);
+    // Enqueue pending operation
+    final operation = PendingOperationEntity(
+      entityType: 'bike',
+      operationType: 'approveBike',
+      entityId: bikeId,
+      createdAt: DateTime.now().toIso8601String(),
+    );
+    await syncManager.enqueueOperation(operation);
+
+    // Return success immediately
+    return AddBikeResponse(
+      success: true,
+      message: 'Bike approved successfully',
+      data: existing != null
+          ? BikeMapper.toDomainBikeFromEntity(existing)
+          : null,
+    );
   }
 
-  Future<AddBikeResponse> deleteBike(String token, int bikeId) async {
-    final bikeResponse = await bikeApiService.deleteBike(token, bikeId);
-
-    // Remove from local database after successful API call
-    if (bikeResponse.success == true) {
+  @override
+  Future<BaseResponse> deleteBike(String token, int bikeId) async {
+    // Optimistically delete the bike from local DB immediately
+    final existing = await bikeDao.getBikeByRemoteId(bikeId);
+    if (existing != null) {
       await bikeDao.deleteBikeByRemoteId(bikeId);
     }
 
-    return BikeMapper.toDomainAddBikeResponse(bikeResponse);
+    // Enqueue pending operation to delete on server
+    final operation = PendingOperationEntity(
+      entityType: 'bike',
+      operationType: 'deleteBike',
+      entityId: bikeId,
+      createdAt: DateTime.now().toIso8601String(),
+    );
+    await syncManager.enqueueOperation(operation);
+
+    // Return success immediately
+    return BaseResponse(
+      success: true,
+      message: 'Bike deleted successfully',
+    );
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fuelsense/data/models/base_response.dart';
 import 'package:http/http.dart' as http;
 import 'package:fuelsense/data/datasources/remote/helper.dart';
 import 'package:fuelsense/data/datasources/remote/header.dart';
@@ -72,6 +73,7 @@ class BikeApiService {
       body: jsonEncode(json),
     );
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+    print("Add bike response: $jsonResponse");
     return data_response.AddBikeResponse.fromJson(jsonResponse);
   }
 
@@ -103,15 +105,12 @@ class BikeApiService {
     return data_response.AddBikeResponse.fromJson(jsonResponse);
   }
 
-  Future<data_response.AddBikeResponse> deleteBike(
-    String token,
-    int bikeId,
-  ) async {
+  Future<BaseResponse> deleteBike(String token, int bikeId) async {
     final response = await http.delete(
       Uri.parse("$baseUrl/admin/bikes/$bikeId/"),
       headers: authorizedHeader(token),
     );
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    return data_response.AddBikeResponse.fromJson(jsonResponse);
+    return BaseResponse.fromJson(jsonResponse);
   }
 }

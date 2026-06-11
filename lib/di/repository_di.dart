@@ -26,6 +26,14 @@ import 'package:fuelsense/domain/usecases/bike/sync_my_bikes_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/sync_pending_bikes_usecase.dart';
 import 'package:fuelsense/domain/usecases/profile/get_profile_usecase.dart';
 import 'package:fuelsense/domain/usecases/profile/sync_profile_usecase.dart';
+import 'package:fuelsense/data/services/connectivity_service.dart';
+import 'package:fuelsense/data/services/sync_manager.dart';
+import 'package:fuelsense/data/services/handlers/bike/select_bike_handler.dart';
+import 'package:fuelsense/data/services/handlers/bike/remove_bike_handler.dart';
+import 'package:fuelsense/data/services/handlers/bike/submit_bike_handler.dart';
+import 'package:fuelsense/data/services/handlers/bike/edit_bike_handler.dart';
+import 'package:fuelsense/data/services/handlers/bike/delete_bike_handler.dart';
+import 'package:fuelsense/data/services/handlers/bike/approve_bike_handler.dart';
 import 'package:fuelsense/di/setup_di.dart';
 
 void setupRepositories() {
@@ -33,12 +41,28 @@ void setupRepositories() {
   getIt.registerLazySingleton<AuthApiService>(() => AuthApiService());
   getIt.registerLazySingleton<BikeApiService>(() => BikeApiService());
 
+  // Register services
+  getIt.registerLazySingleton<ConnectivityService>(() => ConnectivityService());
+  getIt.registerLazySingleton<SyncManager>(
+    () => SyncManager(getIt(), getIt(), getIt()),
+  );
+
+  // Register operation handlers
+  getIt.registerLazySingleton(() => SelectBikeHandler(getIt(), getIt()));
+  getIt.registerLazySingleton(() => RemoveBikeHandler(getIt(), getIt()));
+  getIt.registerLazySingleton(
+    () => SubmitBikeHandler(getIt(), getIt(), getIt()),
+  );
+  getIt.registerLazySingleton(() => EditBikeHandler(getIt(), getIt(), getIt()));
+  getIt.registerLazySingleton(() => DeleteBikeHandler(getIt(), getIt()));
+  getIt.registerLazySingleton(() => ApproveBikeHandler(getIt(), getIt()));
+
   // Register concrete implementations under their abstraction types
   getIt.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(getIt()),
   );
   getIt.registerLazySingleton<BikeRepository>(
-    () => BikeRepositoryImpl(getIt(), getIt()),
+    () => BikeRepositoryImpl(getIt(), getIt(), getIt()),
   );
   getIt.registerLazySingleton<PreferencesRepository>(
     () => PreferencesRepositoryImpl(getIt()),
@@ -142,4 +166,16 @@ void setupRepositories() {
   getIt.registerLazySingleton(
     () => GetProfileUseCase(getIt(), getIt<PreferencesRepository>()),
   );
+
+  // Register operation handlers with SyncManager
+  final syncManager = getIt<SyncManager>();
+  syncManager.registerHandler('selectBike', getIt<SelectBikeHandler>());
+  syncManager.registerHandler('removeBike', getIt<RemoveBikeHandler>());
+  syncManager.registerHandler('submitBike', getIt<SubmitBikeHandler>());
+  syncManager.registerHandler('editBike', getIt<EditBikeHandler>());
+  syncManager.registerHandler('deleteBike', getIt<DeleteBikeHandler>());
+  syncManager.registerHandler('approveBike', getIt<ApproveBikeHandler>());
+
+  // Initialize SyncManager
+  syncManager.init();
 }

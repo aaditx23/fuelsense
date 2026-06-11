@@ -5,8 +5,9 @@ import 'package:fuelsense/presentation/screens/add_bike/add_bike_screen.dart';
 import 'package:fuelsense/presentation/screens/auth/login/login_screen.dart';
 import 'package:fuelsense/presentation/screens/auth/signup/signup_screen.dart';
 import 'package:fuelsense/presentation/screens/my_bikes/my_bikes_screen.dart';
-import 'package:fuelsense/presentation/edit/bike_edit_screen.dart';
+import 'package:fuelsense/presentation/screens/edit/bike_edit_screen.dart';
 import 'package:fuelsense/presentation/screens/pending_bikes/pending_bike_screen.dart';
+import 'package:fuelsense/presentation/screens/pending_operations/pending_operations_screen.dart';
 import 'package:fuelsense/presentation/screens/profile/profile_screen.dart';
 
 import '../di/setup_di.dart';
@@ -21,6 +22,7 @@ Map<String, WidgetBuilder> getRoute(context) {
     "/my_bikes": (context) => MyBikesScreen(),
     "/add_bike": (context) => AddBikeScreen(),
     "/pending_bikes": (context) => PendingBikeScreen(),
+    "/pending_operations": (context) => const PendingOperationsScreen(),
     "/edit_bike": (context) {
       final bike = ModalRoute.of(context)!.settings.arguments as Bike;
       return EditBikeScreen(bike: bike);

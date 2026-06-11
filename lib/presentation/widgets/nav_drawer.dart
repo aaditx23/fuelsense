@@ -66,6 +66,14 @@ class NavDrawer extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/pending_bikes');
             },
           ),
+          ListTile(
+            leading: const Icon(Icons.sync),
+            title: const Text('Pending Operations'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/pending_operations');
+            },
+          ),
         ],
       ),
     );

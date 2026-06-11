@@ -11,4 +11,6 @@ Future<void> setupDatabase() async {
   getIt.registerSingleton(database.userDao);
 
   getIt.registerSingleton(database.bikeDao);
+
+  getIt.registerSingleton(database.pendingOperationDao);
 }

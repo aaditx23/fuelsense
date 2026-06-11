@@ -17,10 +17,13 @@ class BikeModel {
   final String? image;
   final int? submittedBy;
   final String? adminNote;
+  @JsonKey(defaultValue: true)
   final bool isActive;
   final String createdAt;
   final String updatedAt;
+  @JsonKey(defaultValue: false)
   final bool isMine;
+  @JsonKey(defaultValue: true)
   final bool isPending;
 
   BikeModel({
@@ -39,8 +42,8 @@ class BikeModel {
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
-    this.isMine = false,
-    this.isPending = false,
+    required this.isMine,
+    required this.isPending,
   });
 
   factory BikeModel.fromJson(Map<String, dynamic> json) =>

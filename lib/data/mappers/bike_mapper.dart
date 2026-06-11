@@ -1,7 +1,6 @@
 import 'package:fuelsense/data/models/bike/bike_model.dart' as data_bike;
 import 'package:fuelsense/data/models/bike/bike_request.dart' as data_request;
 import 'package:fuelsense/data/models/bike/bike_response.dart' as data_response;
-import 'package:fuelsense/domain/entities/bike/add_bike_response.dart';
 import 'package:fuelsense/domain/entities/bike/bike.dart';
 import 'package:fuelsense/domain/entities/bike/bike_request.dart';
 import 'package:fuelsense/domain/entities/bike/bike_response.dart';
@@ -74,13 +73,29 @@ class BikeMapper {
     );
   }
 
-  static AddBikeResponse toDomainAddBikeResponse(
-    data_response.AddBikeResponse data,
-  ) {
-    return AddBikeResponse(
-      success: data.success,
-      message: data.message,
-      data: data.data != null ? toDomainBike(data.data!) : null,
+  static BikeEntity toEntityFromDataModel(
+    data_bike.BikeModel data, {
+    bool isMine = false,
+    bool isPending = false,
+  }) {
+    return BikeEntity(
+      remoteId: data.id,
+      brand: data.brand,
+      model: data.model,
+      engineCc: data.engineCc,
+      modelYear: data.modelYear,
+      fuelType: data.fuelType,
+      expectedMileage: data.expectedMileage,
+      tankCapacity: data.tankCapacity,
+      reserveCapacity: data.reserveCapacity,
+      image: data.image,
+      submittedBy: data.submittedBy,
+      adminNote: data.adminNote,
+      isActive: data.isActive,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+      isMine: isMine,
+      isPending: isPending,
     );
   }
 }

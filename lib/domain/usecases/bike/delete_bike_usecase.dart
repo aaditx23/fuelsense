@@ -1,3 +1,4 @@
+import 'package:fuelsense/data/models/base_response.dart';
 import 'package:fuelsense/domain/entities/bike/add_bike_response.dart';
 import 'package:fuelsense/domain/repositories/preferences_repository.dart';
 import 'package:fuelsense/domain/repositories/bike_repository.dart';
@@ -8,7 +9,7 @@ class DeleteBikeUseCase {
 
   DeleteBikeUseCase(this.repository, this.prefs);
 
-  Future<AddBikeResponse> call(int bikeId) async {
+  Future<BaseResponse> call(int bikeId) async {
     final token = prefs.getToken();
     if (token == null) throw Exception('No token');
 

@@ -1,3 +1,4 @@
+import 'package:fuelsense/data/models/base_response.dart';
 import 'package:fuelsense/domain/entities/bike/add_bike_response.dart';
 import 'package:fuelsense/domain/entities/bike/bike_request.dart';
 import 'package:fuelsense/domain/entities/bike/bike_response.dart';
@@ -15,7 +16,7 @@ abstract class BikeRepository {
   );
   Future<BikeResponse> getPendingBikes(String token);
   Future<AddBikeResponse> approveBike(String token, int bikeId);
-  Future<AddBikeResponse> deleteBike(String token, int bikeId);
+  Future<BaseResponse> deleteBike(String token, int bikeId);
   Future<void> syncAllBikes(String token);
   Future<void> syncMyBikes(String token);
   Future<void> syncPendingBikes(String token);
