@@ -29,6 +29,7 @@ class UserResponse {
 
   UserEntity toEntity(String password){
     return UserEntity(
+        id: id,
         username: username,
         email: email,
         password: password,

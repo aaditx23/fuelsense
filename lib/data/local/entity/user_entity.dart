@@ -5,7 +5,8 @@ import 'package:floor/floor.dart';
 class UserEntity {
 
   @PrimaryKey(autoGenerate: true)
-  int? id;
+  int? localId;
+  int id;
   String username;
   String email;
   String password;
@@ -13,6 +14,7 @@ class UserEntity {
   String? profile_image;
 
   UserEntity({
+    required this.id,
     required this.username,
     required this.email,
     required this.password,

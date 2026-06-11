@@ -6,8 +6,8 @@ abstract class UserDao {
   @Query('SELECT * FROM users')
   Future<List<UserEntity>> getAllUsers();
 
-  @Query('SELECT * FROM users WHERE id = :id')
-  Future<UserEntity?> getUserById(int id);
+  @Query('SELECT * FROM users WHERE localId = :localId')
+  Future<UserEntity?> getUserById(int localId);
 
   @insert
   Future<int> createUser(UserEntity user);

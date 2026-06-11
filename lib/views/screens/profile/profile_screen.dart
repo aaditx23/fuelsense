@@ -55,6 +55,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                               Text('Email: ${state.user!.email}', style: const TextStyle(fontSize: 16)),
                               const SizedBox(height: 8),
                               Text('Role: ${state.user!.role}', style: const TextStyle(fontSize: 16)),
+                              const SizedBox(height: 8),
+                              Text('ID: ${state.user!.id}', style: const TextStyle(fontSize: 16)),
                             ],
                           ),
                         ),
