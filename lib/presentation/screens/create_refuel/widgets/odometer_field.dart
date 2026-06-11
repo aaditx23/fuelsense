@@ -1,61 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/presentation/screens/create_refuel/create_refuel_notifier.dart';
+import 'package:fuelsense/presentation/screens/create_refuel/utils/meter_reading_validator.dart';
 import 'package:fuelsense/presentation/widgets/outlined_text_field.dart';
 
-class OdometerField extends ConsumerWidget {
+class OdometerField extends ConsumerStatefulWidget {
   final bool enabled;
-  final bool isRequired;
+  final bool isFirstEntry;
   final int userBikeId;
 
   const OdometerField({
     Key? key,
     this.enabled = true,
-    this.isRequired = false,
+    this.isFirstEntry = false,
     required this.userBikeId,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<OdometerField> createState() => _OdometerFieldState();
+}
+
+class _OdometerFieldState extends ConsumerState<OdometerField> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    final existing = ref.read(createRefuelNotifierProvider).odometerReading;
+    _controller = TextEditingController(
+      text: existing != null ? existing.toString() : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(createRefuelNotifierProvider);
     final notifier = ref.read(createRefuelNotifierProvider.notifier);
     final lastOdometerAsync = ref.watch(
-      lastOdometerReadingProvider(userBikeId),
+      lastOdometerReadingProvider(widget.userBikeId),
     );
+    final lastOdometer = lastOdometerAsync.value;
+
+    final label = widget.isFirstEntry
+        ? 'Odometer Reading (km) *'
+        : 'Odometer Reading (km)${state.tripMeterReading == null ? ' *' : ''}';
 
     return OutlinedTextField(
-      initialValue: state.odometerReading?.toString() ?? '',
-      labelText: isRequired
-          ? 'Odometer Reading (km)'
-          : 'Odometer Reading (km) - Optional',
+      controller: _controller,
+      labelText: label,
       hintText: 'Enter odometer reading',
       prefixIcon: const Icon(Icons.directions_car_rounded),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      enabled: enabled,
+      enabled: widget.enabled,
       onChanged: (value) {
         final parsed = double.tryParse(value);
         notifier.updateOdometerReading(parsed);
       },
-      validator: (value) {
-        if (isRequired &&
-            (value == null || value.isEmpty) &&
-            state.tripMeterReading == null) {
-          return 'At least one reading is required';
-        }
-        if (value != null && value.isNotEmpty) {
-          final parsed = double.tryParse(value);
-          if (parsed == null) {
-            return 'Please enter a valid number';
-          }
-
-          // Validate against last odometer reading
-          final lastOdometer = lastOdometerAsync.value;
-          if (lastOdometer != null && parsed < lastOdometer) {
-            return 'Cannot be less than last reading (${lastOdometer.toStringAsFixed(1)} km)';
-          }
-        }
-        return null;
-      },
+      validator: (value) => MeterReadingValidator.validateOdometer(
+        value: value,
+        isFirstEntry: widget.isFirstEntry,
+        currentTripMeter: state.tripMeterReading,
+        lastOdometerReading: lastOdometer,
+      ),
     );
   }
 }
