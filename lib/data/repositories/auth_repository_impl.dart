@@ -13,6 +13,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AuthResponse> login(LoginRequest loginRequest) async {
     final dataReq = AuthMapper.toDataLoginRequest(loginRequest);
+
     final authResponse = await _authApiService.login(dataReq);
     return AuthMapper.toDomainAuthResponse(authResponse);
   }

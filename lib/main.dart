@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: getInitialRoute(),
       routes: getRoute(context),
-      title: 'fuelsense',
+      title: 'FuelSense',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
