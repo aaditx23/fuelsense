@@ -3,12 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/domain/entities/auth/signup_request.dart';
 import 'package:fuelsense/presentation/screens/auth/signup/signup_notifier.dart';
 import 'package:fuelsense/presentation/screens/auth/signup/signup_state.dart';
-import 'package:fuelsense/presentation/widgets/dropdown_widget.dart';
-import 'package:fuelsense/presentation/widgets/image_picker/pick_crop_image.dart';
 import 'package:fuelsense/presentation/widgets/image_picker/pick_image.dart';
 import 'package:fuelsense/presentation/widgets/password_field.dart';
 import 'package:fuelsense/presentation/widgets/response_text.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../../widgets/outlined_text_field.dart';
 
@@ -25,7 +22,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  String _selectedRole = "user";
+  String _selectedRole = "USER";
   String? _profileImage;
 
   @override

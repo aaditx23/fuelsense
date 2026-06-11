@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:fuelsense/data/datasources/remote/helper.dart';
+
 import 'package:fuelsense/data/datasources/remote/header.dart';
+import 'package:fuelsense/data/datasources/remote/helper.dart';
 import 'package:fuelsense/data/models/auth/auth_response.dart' as data_auth;
 import 'package:fuelsense/data/models/auth/request.dart' as data_request;
+import 'package:http/http.dart' as http;
 
 class AuthApiService {
   Future<data_auth.AuthResponse> login(
@@ -17,6 +18,7 @@ class AuthApiService {
       headers: formHeader(),
     );
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+    print(jsonResponse);
     final authResponse = data_auth.AuthResponse.fromJson(jsonResponse);
     authResponse.code = response.statusCode;
     return authResponse;

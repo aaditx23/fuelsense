@@ -1,7 +1,8 @@
 import 'dart:convert';
+
 import 'package:fuelsense/data/datasources/local/dao/user_dao.dart';
-import 'package:fuelsense/data/datasources/remote/helper.dart';
 import 'package:fuelsense/data/datasources/remote/header.dart';
+import 'package:fuelsense/data/datasources/remote/helper.dart';
 import 'package:fuelsense/data/models/user/user_response.dart';
 import 'package:fuelsense/domain/entities/auth/user.dart';
 import 'package:fuelsense/domain/repositories/profile_repository.dart'
@@ -15,20 +16,19 @@ class ProfileRepositoryImpl implements domain_profile.ProfileRepository {
 
   @override
   Stream<User?> getProfile(String token) async* {
-    final userId = await _getCurrentUserId();
-    if (userId == null) {
-      yield null;
-      return;
-    }
-    await for (final userEntity in userDao.getUserById(userId)) {
-      yield userEntity != null ? User.fromEntity(userEntity) : null;
+    // Watch all users reactively — unaffected by localId changes from upsertUser
+    await for (final users in userDao.watchAllUsers()) {
+      if (users.isEmpty) {
+        yield null;
+      } else {
+        yield User.fromEntity(users.first);
+      }
     }
   }
 
   @override
   Future<void> syncProfile(String token) async {
     try {
-      // Assume there's a /auth/me endpoint that returns user profile
       final response = await http.get(
         Uri.parse("$baseUrl/user/profile/"),
         headers: authorizedHeader(token),
@@ -36,7 +36,11 @@ class ProfileRepositoryImpl implements domain_profile.ProfileRepository {
 
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-        final userResponse = UserResponse.fromJson(jsonResponse);
+        // API returns envelope: { success, message, data: { id, ... } }
+        final userData =
+            (jsonResponse['data'] as Map<String, dynamic>?) ?? jsonResponse;
+        final userResponse = UserResponse.fromJson(userData);
+        print("USerData: ${userResponse.id}");
 
         // Upsert the user data
         final userEntity = userResponse.toEntity(
@@ -48,12 +52,5 @@ class ProfileRepositoryImpl implements domain_profile.ProfileRepository {
       // If sync fails, just continue - we still have local data
       print('Profile sync failed: $e');
     }
-  }
-
-  Future<int?> _getCurrentUserId() async {
-    // This is a simplified implementation
-    // In a real app, you'd get this from preferences or some other way
-    final users = await userDao.getAllUsers();
-    return users.isNotEmpty ? users.first.localId : null;
   }
 }

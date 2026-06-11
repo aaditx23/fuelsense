@@ -23,6 +23,7 @@ class ProfileNotifier extends StreamNotifier<ProfileState> {
     );
 
     // Listen to the user stream and yield states
+
     await for (final user in getProfileUseCase()) {
       if (user == null) {
         yield ProfileState(isLoading: false, message: 'User not found');

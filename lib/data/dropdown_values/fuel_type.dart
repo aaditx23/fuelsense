@@ -1,1 +1,1 @@
-final List<String> fuelType = ["Octane", "Petrol"];
+final List<String> fuelType = ["OCTANE", "PETROL"];

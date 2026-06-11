@@ -6,6 +6,9 @@ abstract class UserDao {
   @Query('SELECT * FROM users')
   Future<List<UserEntity>> getAllUsers();
 
+  @Query('SELECT * FROM users')
+  Stream<List<UserEntity>> watchAllUsers();
+
   @Query('SELECT * FROM users WHERE localId = :localId')
   Stream<UserEntity?> getUserById(int localId);
 
