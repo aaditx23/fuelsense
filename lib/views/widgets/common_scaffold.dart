@@ -6,6 +6,7 @@ class CommonScaffold extends StatelessWidget {
   final String? title;
   final bool showDrawer;
   final List<Widget>? actions;
+  final FloatingActionButton? fab;
 
   const CommonScaffold({
     Key? key,
@@ -13,6 +14,7 @@ class CommonScaffold extends StatelessWidget {
     this.title,
     this.showDrawer = true,
     this.actions,
+    this.fab,
   }) : super(key: key);
 
   @override
@@ -21,9 +23,12 @@ class CommonScaffold extends StatelessWidget {
       appBar: AppBar(
         title: title != null ? Text(title!) : null,
         actions: actions,
+        centerTitle: true,
       ),
       drawer: showDrawer ? const NavDrawer() : null,
       body: body,
+
+      floatingActionButton: fab,
     );
   }
 }

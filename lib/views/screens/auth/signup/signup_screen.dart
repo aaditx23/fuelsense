@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fuelsense/data/remote/auth/schema/request.dart';
 import 'package:fuelsense/views/screens/auth/signup/signup_notifier.dart';
 import 'package:fuelsense/views/screens/auth/signup/signup_state.dart';
+import 'package:fuelsense/views/widgets/image_picker/pick_crop_image.dart';
+import 'package:fuelsense/views/widgets/image_picker/pick_profile_image.dart';
 import 'package:fuelsense/views/widgets/password_field.dart';
 import 'package:fuelsense/views/widgets/role_dropdown.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../widgets/outlined_text_field.dart';
 
@@ -24,6 +27,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _profileImageController = TextEditingController();
 
   String _selectedRole = "user";
+  String? _profileImage;
 
   @override
   void dispose() {
@@ -91,6 +95,12 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
+                      PickProfileImage(
+                        onClick: () async {
+                          _profileImage = await pickCropImage(ImageSource.gallery);
+                        },
+                      ),
+                      const SizedBox(height: 12),
                       OutlinedTextField(
                         controller: _nameController,
                         labelText: 'Name',

@@ -9,7 +9,7 @@ class ProfileImageWidget extends StatelessWidget {
     Key? key,
     required this.imageUrl,
     this.radius = 40,
-    this.defaultAsset = 'assets/images/default_profile.png',
+    this.defaultAsset = 'assets/images/user_default.png',
   }) : super(key: key);
 
   @override
