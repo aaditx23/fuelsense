@@ -44,6 +44,7 @@ lib/
 | [flutter](https://flutter.dev) | SDK | Core framework |
 | [provider](https://pub.dev/packages/provider) | ^6.1.1 | State management |
 | [get_it](https://pub.dev/packages/get_it) | ^7.6.0 | Dependency injection |
+| [change_app_package_name](https://pub.dev/packages/change_app_package_name) | ^1.5.0 | Change app package name |
 
 ### Database
 | Package | Version | Purpose |
@@ -74,14 +75,26 @@ lib/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://gitlab.com/aaditx23/fuelsense.git
    cd fuelsense
    ```
-
+    **Regenerate android folder**
+    ```bash
+    rm -rf android
+    flutter create . --platforms=android
+    flutter pub run change_app_package_name:main com.aaditx23.fuelsense
+    ```
+   **Regenerate ios folder (mac only)**
+    ```bash
+    rm -rf ios
+    flutter create . --platforms=ios
+    flutter pub run change_app_package_name:main com.aaditx23.fuelsense
+    ```
 2. **Install dependencies**
    ```bash
    flutter pub get
    ```
+   
 
 3. **Generate code**
    ```bash
