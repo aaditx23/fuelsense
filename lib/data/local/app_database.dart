@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:floor/floor.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
-import 'package:flutter_template/data/local/dao/name_dao.dart';
-import 'package:flutter_template/data/local/entity/name_entity.dart';
+import 'package:template_flutter/data/local/dao/name_dao.dart';
+import 'package:template_flutter/data/local/entity/name_entity.dart';
 
 part 'app_database.g.dart';
 

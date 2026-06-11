@@ -1,5 +1,5 @@
-import 'package:flutter_template/data/repository/placeholder_repository.dart';
-import 'package:flutter_template/di/setup_di.dart';
+import 'package:template_flutter/data/repository/placeholder_repository.dart';
+import 'package:template_flutter/di/setup_di.dart';
 
 void setupRepositories() {
   getIt.registerLazySingleton<PlaceholderRepository>(

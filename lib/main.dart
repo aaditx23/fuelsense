@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_template/di/setup_di.dart';
-import 'package:flutter_template/navigation/routes.dart';
-import 'package:flutter_template/views/screens/screen01/screen01_provider.dart';
-import 'package:flutter_template/views/screens/screen02/screen02_provider.dart';
+import 'package:template_flutter/di/setup_di.dart';
+import 'package:template_flutter/navigation/routes.dart';
+import 'package:template_flutter/views/screens/screen01/screen01_provider.dart';
+import 'package:template_flutter/views/screens/screen02/screen02_provider.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: "/screen01",
       routes: getRoute(context),
-      title: 'flutter_template',
+      title: 'template_flutter',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_template/views/screens/screen01/screen01_provider.dart';
+import 'package:template_flutter/views/screens/screen01/screen01_provider.dart';
 import 'package:provider/provider.dart';
 
 class Screen01 extends StatefulWidget {

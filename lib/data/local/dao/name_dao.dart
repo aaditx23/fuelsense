@@ -1,5 +1,5 @@
 import 'package:floor/floor.dart';
-import 'package:flutter_template/data/local/entity/name_entity.dart';
+import 'package:template_flutter/data/local/entity/name_entity.dart';
 
 @dao
 abstract class NameDao {

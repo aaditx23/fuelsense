@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_template/data/model/todo_model.dart';
-import 'package:flutter_template/data/repository/placeholder_repository.dart';
-import 'package:flutter_template/di/setup_di.dart';
+import 'package:template_flutter/data/model/todo_model.dart';
+import 'package:template_flutter/data/repository/placeholder_repository.dart';
+import 'package:template_flutter/di/setup_di.dart';
 
 class Screen02Provider with ChangeNotifier {
   final PlaceholderRepository pr = getIt<PlaceholderRepository>();
