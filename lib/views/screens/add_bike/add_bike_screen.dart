@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fuelsense/views/screens/add_bike/add_bike_validators.dart';
 import 'package:fuelsense/views/widgets/common_scaffold.dart';
 import 'package:fuelsense/views/widgets/dropdown_widget.dart';
+import 'package:fuelsense/views/widgets/image_picker/pick_image.dart';
 import 'package:fuelsense/views/widgets/outlined_text_field.dart';
 
 import '../../../data/dropdown_values/fuel_type.dart';
@@ -41,15 +42,17 @@ class _AddBikeScreenState extends State<AddBikeScreen> {
   }
 
   void _handleSubmit() {
-    if (_formKey.currentState!.validate()) {
-      // TODO: Handle form submission
-    }
+    if (_formKey.currentState!.validate()) {}
   }
 
   @override
   Widget build(BuildContext context) {
     return CommonScaffold(
       title: 'Add Bike',
+      fab: FloatingActionButton(
+        onPressed: _handleSubmit,
+        child: Icon(Icons.cloud_upload),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -57,6 +60,13 @@ class _AddBikeScreenState extends State<AddBikeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              PickImage(
+                onSet: (value) {},
+                defaultImage: "assets/images/default_bike.png",
+                size: 200,
+                circle: false,
+              ),
+              const SizedBox(height: 16),
               // Brand field
               OutlinedTextField(
                 controller: _brandController,
@@ -148,21 +158,6 @@ class _AddBikeScreenState extends State<AddBikeScreen> {
                 validator: AddBikeValidators.validateReserveCapacity,
               ),
               const SizedBox(height: 24),
-
-              // Submit button
-              ElevatedButton(
-                onPressed: _handleSubmit,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  'Submit',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
             ],
           ),
         ),

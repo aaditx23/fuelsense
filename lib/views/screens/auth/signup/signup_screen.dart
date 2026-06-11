@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fuelsense/data/dropdown_values/role_type.dart';
 import 'package:fuelsense/data/remote/auth/schema/request.dart';
 import 'package:fuelsense/views/screens/auth/signup/signup_notifier.dart';
 import 'package:fuelsense/views/screens/auth/signup/signup_state.dart';
+import 'package:fuelsense/views/widgets/dropdown_widget.dart';
 import 'package:fuelsense/views/widgets/image_picker/pick_crop_image.dart';
-import 'package:fuelsense/views/widgets/image_picker/pick_profile_image.dart';
+import 'package:fuelsense/views/widgets/image_picker/pick_image.dart';
 import 'package:fuelsense/views/widgets/password_field.dart';
-import 'package:fuelsense/views/widgets/role_dropdown.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../widgets/outlined_text_field.dart';
-
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -25,14 +25,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-
   String _selectedRole = "user";
   String? _profileImage;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    Future.microtask((){
+    Future.microtask(() {
       ref.read(signupNotifier.notifier).reset();
     });
   }
@@ -61,7 +60,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     });
 
     void onSignup() {
-      if(_formKey.currentState!.validate()){
+      if (_formKey.currentState!.validate()) {
         final signupRequest = SignupRequest(
           username: _nameController.text.trim(),
           email: _emailController.text.trim(),
@@ -105,49 +104,59 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      PickProfileImage(
+                      PickImage(
                         onSet: (image) {
                           _profileImage = image;
                         },
+                        defaultImage: "assets/images/user_default.png",
+                        circle: false,
                       ),
                       const SizedBox(height: 12),
                       OutlinedTextField(
                         controller: _nameController,
                         labelText: 'Name',
-                        validator: (value) => value == null || value.isEmpty ? 'Enter your name' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Enter your name'
+                            : null,
                       ),
                       const SizedBox(height: 12),
                       OutlinedTextField(
                         controller: _emailController,
                         labelText: 'Email',
                         keyboardType: TextInputType.emailAddress,
-                        validator: (value) => value == null || value.isEmpty ? 'Enter your Email' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Enter your Email'
+                            : null,
                       ),
                       const SizedBox(height: 12),
                       PasswordField(
                         controller: _passwordController,
                         labelText: 'Password',
-                        validator: (value) => value == null || value.isEmpty ? 'Enter your password' : null,
+                        validator: (value) => value == null || value.isEmpty
+                            ? 'Enter your password'
+                            : null,
                       ),
                       const SizedBox(height: 12),
 
-                      RoleDropdown(
-                        value: _selectedRole,
-                        onChanged: (val) {
+                      DropdownWidget(
+                        items: roleType,
+                        onChanged: (value) {
                           setState(() {
-                            _selectedRole = val ?? "user";
+                            _selectedRole = value ?? "user";
                           });
                         },
+                        labelText: "Role",
+                        prefixIcon: Icons.add_moderator_outlined,
                       ),
                       const SizedBox(height: 24),
                       ElevatedButton(
-                        onPressed: state.isLoading
-                            ? null
-                            : () => onSignup(),
+                        onPressed: state.isLoading ? null : () => onSignup(),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
-                            elevation: 0,
-                            backgroundColor: Theme.of(context).colorScheme.primaryContainer
+                          elevation: 0,
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer,
                         ),
                         child: state.isLoading
                             ? const SizedBox(

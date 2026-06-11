@@ -17,7 +17,7 @@ class DropdownWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return DropdownButtonFormField(
       items: items.map((String item) {
-        return DropdownMenuItem(value: item, child: Text(item));
+        return DropdownMenuItem(value: item, child: Text(item.toUpperCase()));
       }).toList(),
       onChanged: (value) => onChanged(value),
       initialValue: items[0],
