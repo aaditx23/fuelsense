@@ -1,9 +1,13 @@
 import 'dart:convert';
 
 import 'package:fuelsense/data/datasources/remote/helper.dart';
-import 'package:fuelsense/data/models/bike/bike_request.dart';
-import 'package:fuelsense/data/models/bike/bike_response.dart';
+import 'package:fuelsense/data/mappers/bike_mapper.dart';
+import 'package:fuelsense/data/models/bike/bike_request.dart' as data_request;
+import 'package:fuelsense/data/models/bike/bike_response.dart' as data_response;
 import 'package:fuelsense/data/datasources/remote/header.dart';
+import 'package:fuelsense/domain/entities/bike/add_bike_response.dart';
+import 'package:fuelsense/domain/entities/bike/bike_request.dart';
+import 'package:fuelsense/domain/entities/bike/bike_response.dart';
 import 'package:http/http.dart' as http;
 
 import '../../domain/repositories/bike_repository.dart';
@@ -15,8 +19,8 @@ class BikeRepositoryImpl implements BikeRepository {
       headers: authorizedHeader(token),
     );
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    final bikeResponse = BikeResponse.fromJson(jsonResponse);
-    return bikeResponse;
+    final bikeResponse = data_response.BikeResponse.fromJson(jsonResponse);
+    return BikeMapper.toDomainBikeResponse(bikeResponse);
   }
 
   Future<BikeResponse> selectBike(String token, int bikeId) async {
@@ -27,8 +31,8 @@ class BikeRepositoryImpl implements BikeRepository {
     );
 
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    final bikeResponse = BikeResponse.fromJson(jsonResponse);
-    return bikeResponse;
+    final bikeResponse = data_response.BikeResponse.fromJson(jsonResponse);
+    return BikeMapper.toDomainBikeResponse(bikeResponse);
   }
 
   Future<BikeResponse> getMyBikes(String token) async {
@@ -37,8 +41,8 @@ class BikeRepositoryImpl implements BikeRepository {
       headers: authorizedHeader(token),
     );
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    final bikeResponse = BikeResponse.fromJson(jsonResponse);
-    return bikeResponse;
+    final bikeResponse = data_response.BikeResponse.fromJson(jsonResponse);
+    return BikeMapper.toDomainBikeResponse(bikeResponse);
   }
 
   Future<BikeResponse> removeMyBike(String token, int bikeId) async {
@@ -51,23 +55,24 @@ class BikeRepositoryImpl implements BikeRepository {
     print(response.body.isEmpty);
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
     print(jsonResponse);
-    final bikeResponse = BikeResponse.fromJson(jsonResponse);
-    return bikeResponse;
+    final bikeResponse = data_response.BikeResponse.fromJson(jsonResponse);
+    return BikeMapper.toDomainBikeResponse(bikeResponse);
   }
 
   Future<AddBikeResponse> submitBike(
     String token,
     BikeRequest bikeRequest,
   ) async {
-    final json = bikeRequest.toJson();
+    final dataReq = BikeMapper.toDataBikeRequest(bikeRequest);
+    final json = dataReq.toJson();
     final response = await http.post(
       Uri.parse("$baseUrl/bikes/submit/"),
       headers: authorizedHeader(token),
       body: jsonEncode(json),
     );
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    final bikeResponse = AddBikeResponse.fromJson(jsonResponse);
-    return bikeResponse;
+    final bikeResponse = data_response.AddBikeResponse.fromJson(jsonResponse);
+    return BikeMapper.toDomainAddBikeResponse(bikeResponse);
   }
 
   Future<AddBikeResponse> editBike(
@@ -75,7 +80,8 @@ class BikeRepositoryImpl implements BikeRepository {
     BikeRequest bikeRequest,
     int id,
   ) async {
-    final json = bikeRequest.toJson();
+    final dataReq = BikeMapper.toDataBikeRequest(bikeRequest);
+    final json = dataReq.toJson();
     final response = await http.put(
       Uri.parse("$baseUrl/admin/bikes/$id/edit/"),
       headers: authorizedHeader(token),
@@ -83,8 +89,8 @@ class BikeRepositoryImpl implements BikeRepository {
     );
     print(response.body.toString());
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    final bikeResponse = AddBikeResponse.fromJson(jsonResponse);
-    return bikeResponse;
+    final bikeResponse = data_response.AddBikeResponse.fromJson(jsonResponse);
+    return BikeMapper.toDomainAddBikeResponse(bikeResponse);
   }
 
   Future<BikeResponse> getPendingBikes(String token) async {
@@ -93,9 +99,8 @@ class BikeRepositoryImpl implements BikeRepository {
       headers: authorizedHeader(token),
     );
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    final bikeResponse = BikeResponse.fromJson(jsonResponse);
-    print("BIKE RESPONSE: ${bikeResponse.listData![0].reserveCapacity}");
-    return bikeResponse;
+    final bikeResponse = data_response.BikeResponse.fromJson(jsonResponse);
+    return BikeMapper.toDomainBikeResponse(bikeResponse);
   }
 
   Future<AddBikeResponse> approveBike(String token, int bikeId) async {
@@ -106,8 +111,8 @@ class BikeRepositoryImpl implements BikeRepository {
     );
 
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    final bikeResponse = AddBikeResponse.fromJson(jsonResponse);
-    return bikeResponse;
+    final bikeResponse = data_response.AddBikeResponse.fromJson(jsonResponse);
+    return BikeMapper.toDomainAddBikeResponse(bikeResponse);
   }
 
   Future<AddBikeResponse> deleteBike(String token, int bikeId) async {
@@ -119,7 +124,7 @@ class BikeRepositoryImpl implements BikeRepository {
     print(response.body.toString());
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
     jsonResponse["data"] = null;
-    final bikeResponse = AddBikeResponse.fromJson(jsonResponse);
-    return bikeResponse;
+    final bikeResponse = data_response.AddBikeResponse.fromJson(jsonResponse);
+    return BikeMapper.toDomainAddBikeResponse(bikeResponse);
   }
 }

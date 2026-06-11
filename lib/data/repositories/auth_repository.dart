@@ -1,15 +1,20 @@
 import 'dart:convert';
 
-import 'package:fuelsense/data/models/auth/auth_response.dart';
-import 'package:fuelsense/data/models/auth/request.dart';
+import 'package:fuelsense/data/mappers/auth_mapper.dart';
+import 'package:fuelsense/data/models/auth/auth_response.dart' as data_auth;
+import 'package:fuelsense/data/models/auth/request.dart' as data_request;
 import 'package:fuelsense/data/datasources/remote/helper.dart';
 import 'package:fuelsense/data/datasources/remote/header.dart';
+import 'package:fuelsense/domain/entities/auth/auth_response.dart';
+import 'package:fuelsense/domain/entities/auth/login_request.dart';
+import 'package:fuelsense/domain/entities/auth/signup_request.dart';
 import 'package:http/http.dart' as http;
 import 'package:fuelsense/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   Future<AuthResponse> login(LoginRequest loginRequest) async {
-    final json = loginRequest.toJson();
+    final dataReq = AuthMapper.toDataLoginRequest(loginRequest);
+    final json = dataReq.toJson();
     final encodedBody = urlEncodeBody(json);
     final response = await http.post(
       Uri.parse("$baseUrl/auth/login/"),
@@ -18,14 +23,14 @@ class AuthRepositoryImpl implements AuthRepository {
     );
 
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    final authResponse = AuthResponse.fromJson(jsonResponse);
+    final authResponse = data_auth.AuthResponse.fromJson(jsonResponse);
     authResponse.code = response.statusCode;
-    return authResponse;
+    return AuthMapper.toDomainAuthResponse(authResponse);
   }
 
   Future<AuthResponse> signup(SignupRequest signupRequest) async {
-    final json = jsonEncode(signupRequest.toJson());
-    print(json);
+    final dataReq = AuthMapper.toDataSignupRequest(signupRequest);
+    final json = jsonEncode(dataReq.toJson());
     final response = await http.post(
       Uri.parse("$baseUrl/auth/register/"),
       body: json,
@@ -36,10 +41,8 @@ class AuthRepositoryImpl implements AuthRepository {
     );
 
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
-    final authResponse = AuthResponse.fromJson(jsonResponse);
-    print("register response");
-    print(authResponse);
+    final authResponse = data_auth.AuthResponse.fromJson(jsonResponse);
     authResponse.code = response.statusCode;
-    return authResponse;
+    return AuthMapper.toDomainAuthResponse(authResponse);
   }
 }

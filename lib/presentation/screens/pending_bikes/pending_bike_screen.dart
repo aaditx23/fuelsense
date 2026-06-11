@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fuelsense/data/models/bike/bike_model.dart';
+import 'package:fuelsense/domain/entities/bike/bike.dart';
 import 'package:fuelsense/presentation/screens/pending_bikes/pending_bikes_notifier.dart';
 import 'package:fuelsense/presentation/widgets/common_scaffold.dart';
 import 'package:fuelsense/presentation/widgets/response_text.dart';
@@ -38,7 +38,7 @@ class _PendingBikeScreenState extends ConsumerState<PendingBikeScreen> {
     );
   }
 
-  List<BikeModel> _filterBikes(List<BikeModel> bikes) {
+  List<Bike> _filterBikes(List<Bike> bikes) {
     if (_searchQuery.isEmpty) return bikes;
     final query = _searchQuery.toLowerCase();
     return bikes.where((bike) {

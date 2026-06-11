@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fuelsense/data/dropdown_values/role_type.dart';
-import 'package:fuelsense/data/models/auth/request.dart';
+import 'package:fuelsense/domain/entities/auth/signup_request.dart';
 import 'package:fuelsense/presentation/screens/auth/signup/signup_notifier.dart';
 import 'package:fuelsense/presentation/screens/auth/signup/signup_state.dart';
 import 'package:fuelsense/presentation/widgets/dropdown_widget.dart';

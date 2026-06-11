@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:fuelsense/data/models/bike/bike_request.dart';
+import 'package:fuelsense/domain/entities/bike/bike_request.dart';
 import 'package:fuelsense/di/setup_di.dart';
 import 'package:fuelsense/domain/usecases/bike/get_pending_bikes_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/edit_bike_usecase.dart';

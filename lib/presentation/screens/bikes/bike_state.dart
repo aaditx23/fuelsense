@@ -1,12 +1,10 @@
-
-
-import 'package:fuelsense/data/models/bike/bike_model.dart';
+import 'package:fuelsense/domain/entities/bike/bike.dart';
 
 class BikeState {
   final bool isLoading;
   final bool isSuccess;
   final String? message;
-  final List<BikeModel> bikes;
+  final List<Bike> bikes;
   final List<int>? myBikes;
 
   BikeState({
@@ -14,22 +12,22 @@ class BikeState {
     this.isSuccess = false,
     this.message,
     this.bikes = const [],
-    this.myBikes = const []
+    this.myBikes = const [],
   });
 
   BikeState copyWith({
     bool? isLoading,
     bool? isSuccess,
     String? message,
-    List<BikeModel>? bikes,
-    List<int>? myBikes
+    List<Bike>? bikes,
+    List<int>? myBikes,
   }) {
     return BikeState(
       isLoading: isLoading ?? this.isLoading,
       isSuccess: isSuccess ?? this.isSuccess,
       message: message,
       bikes: bikes ?? this.bikes,
-      myBikes: myBikes ?? this.myBikes
+      myBikes: myBikes ?? this.myBikes,
     );
   }
 }

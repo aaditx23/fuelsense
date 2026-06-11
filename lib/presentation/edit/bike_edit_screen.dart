@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fuelsense/data/models/bike/bike_model.dart';
-import 'package:fuelsense/data/models/bike/bike_request.dart';
+import 'package:fuelsense/domain/entities/bike/bike.dart';
+import 'package:fuelsense/domain/entities/bike/bike_request.dart';
 import 'package:fuelsense/presentation/screens/add_bike/add_bike_notifier.dart';
 import 'package:fuelsense/presentation/screens/add_bike/add_bike_validators.dart';
 import 'package:fuelsense/presentation/screens/pending_bikes/pending_bikes_notifier.dart';
@@ -10,7 +10,7 @@ import 'package:fuelsense/presentation/widgets/dropdown_widget.dart';
 import 'package:fuelsense/presentation/widgets/image_picker/pick_image.dart';
 import 'package:fuelsense/presentation/widgets/outlined_text_field.dart';
 
-import '../../../../data/dropdown_values/fuel_type.dart';
+import '../../data/dropdown_values/fuel_type.dart';
 
 /*
 response message: show as toast on top
@@ -18,7 +18,7 @@ fix flicker and change loading indicator to animation
 */
 
 class EditBikeScreen extends ConsumerStatefulWidget {
-  final BikeModel bike;
+  final Bike bike;
   const EditBikeScreen({super.key, required this.bike});
 
   @override
@@ -80,6 +80,7 @@ class _EditBikeScreenState extends ConsumerState<EditBikeScreen> {
         expectedMileage: double.parse(_expectedMileageController.text.trim()),
         tankCapacity: double.parse(_tankCapacityController.text.trim()),
         image: _selectedImage,
+        reserveCapacity: double.parse(_reserveCapacityController.text)
       );
       await ref
           .read(pendingBikesNotifierProvider.notifier)

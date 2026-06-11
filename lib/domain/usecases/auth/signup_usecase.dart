@@ -1,13 +1,14 @@
 import 'package:fuelsense/data/datasources/local/dao/user_dao.dart';
-import 'package:fuelsense/data/models/auth/request.dart';
-import 'package:fuelsense/data/models/auth/auth_response.dart';
-import 'package:fuelsense/data/datasources/local/shared_preferences/shared_preferences.dart';
+import 'package:fuelsense/data/mappers/auth_mapper.dart';
+import 'package:fuelsense/domain/entities/auth/auth_response.dart';
+import 'package:fuelsense/domain/entities/auth/signup_request.dart';
+import 'package:fuelsense/domain/repositories/preferences_repository.dart';
 import 'package:fuelsense/domain/repositories/auth_repository.dart';
 
 class SignupUseCase {
   final AuthRepository authRepository;
   final UserDao userDao;
-  final AppSharedPreferences prefs;
+  final PreferencesRepository prefs;
 
   SignupUseCase(this.authRepository, this.userDao, this.prefs);
 

@@ -1,9 +1,9 @@
-import 'package:fuelsense/data/datasources/local/shared_preferences/shared_preferences.dart';
+import 'package:fuelsense/domain/repositories/preferences_repository.dart';
 import 'package:fuelsense/domain/repositories/bike_repository.dart';
 
 class FetchBikesUseCase {
   final BikeRepository repository;
-  final AppSharedPreferences prefs;
+  final PreferencesRepository prefs;
 
   FetchBikesUseCase(this.repository, this.prefs);
 

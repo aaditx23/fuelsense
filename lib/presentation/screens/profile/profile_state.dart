@@ -1,22 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:fuelsense/data/datasources/local/entity/user_entity.dart';
+
+import 'package:fuelsense/domain/entities/auth/user.dart';
 
 class ProfileState {
   final bool isLoading;
   final String? message;
-  final UserEntity? user;
+  final User? user;
 
-  ProfileState({
-    this.isLoading = false,
-    this.message,
-    this.user,
-  });
+  ProfileState({this.isLoading = false, this.message, this.user});
 
-  ProfileState copyWith({
-    bool? isLoading,
-    String? message,
-    UserEntity? user,
-  }) {
+  ProfileState copyWith({bool? isLoading, String? message, User? user}) {
     return ProfileState(
       isLoading: isLoading ?? this.isLoading,
       message: message ?? this.message,

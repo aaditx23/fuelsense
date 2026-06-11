@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:fuelsense/data/models/auth/request.dart';
+import 'package:fuelsense/domain/entities/auth/login_request.dart';
 import 'package:fuelsense/di/setup_di.dart';
 import 'package:fuelsense/domain/usecases/auth/login_usecase.dart';
 import 'package:fuelsense/presentation/screens/auth/login/login_state.dart';

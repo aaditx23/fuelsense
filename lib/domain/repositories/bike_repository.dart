@@ -1,5 +1,6 @@
-import 'package:fuelsense/data/models/bike/bike_response.dart';
-import 'package:fuelsense/data/models/bike/bike_request.dart';
+import 'package:fuelsense/domain/entities/bike/add_bike_response.dart';
+import 'package:fuelsense/domain/entities/bike/bike_request.dart';
+import 'package:fuelsense/domain/entities/bike/bike_response.dart';
 
 abstract class BikeRepository {
   Future<BikeResponse> fetchAllBikes(String token);

@@ -4,7 +4,7 @@ import 'package:fuelsense/domain/usecases/bike/fetch_bikes_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/select_bike_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/remove_bike_usecase.dart';
 import 'package:fuelsense/domain/usecases/bike/delete_bike_usecase.dart';
-import 'package:fuelsense/data/datasources/local/shared_preferences/shared_preferences.dart';
+import 'package:fuelsense/domain/repositories/preferences_repository.dart';
 import 'bike_state.dart';
 
 class BikeNotifier extends StateNotifier<BikeState> {
@@ -12,7 +12,7 @@ class BikeNotifier extends StateNotifier<BikeState> {
   final SelectBikeUseCase _selectBikeUseCase;
   final RemoveBikeUseCase _removeBikeUseCase;
   final DeleteBikeUseCase _deleteBikeUseCase;
-  final AppSharedPreferences prefs;
+  final PreferencesRepository prefs;
 
   BikeNotifier({
     required FetchBikesUseCase fetchBikesUseCase,
@@ -133,7 +133,7 @@ final bikeNotifierProvider = StateNotifierProvider<BikeNotifier, BikeState>((
   final selectBikeUseCase = getIt<SelectBikeUseCase>();
   final removeBikeUseCase = getIt<RemoveBikeUseCase>();
   final deleteBikeUseCase = getIt<DeleteBikeUseCase>();
-  final prefs = getIt<AppSharedPreferences>();
+  final prefs = getIt<PreferencesRepository>();
   return BikeNotifier(
     fetchBikesUseCase: fetchBikesUseCase,
     selectBikeUseCase: selectBikeUseCase,

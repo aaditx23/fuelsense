@@ -1,24 +1,18 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:fuelsense/data/models/bike/bike_model.dart';
+import 'package:fuelsense/domain/entities/bike/bike.dart';
 
 class MyBikeCard extends StatelessWidget {
-  final BikeModel bike;
+  final Bike bike;
   final Function onAction;
 
-  const MyBikeCard({
-    super.key,
-    required this.bike,
-    required this.onAction
-  });
+  const MyBikeCard({super.key, required this.bike, required this.onAction});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       elevation: 2,
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Padding(
@@ -33,13 +27,15 @@ class MyBikeCard extends StatelessWidget {
                   ? Image.memory(base64Decode(bike.image!))
                   : Image.asset("assets/images/default_bike.png"),
             ),
-            SizedBox(height: 12,),
+            SizedBox(height: 12),
             Text.rich(
               TextSpan(
                 children: [
                   TextSpan(
                     text: 'Brand: ',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   TextSpan(
                     text: bike.brand,
@@ -48,7 +44,9 @@ class MyBikeCard extends StatelessWidget {
                   TextSpan(text: '  '),
                   TextSpan(
                     text: 'Model: ',
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   TextSpan(
                     text: bike.model,
@@ -63,7 +61,9 @@ class MyBikeCard extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: 'Engine: ',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   TextSpan(
                     text: '${bike.engineCc} cc',
@@ -77,7 +77,9 @@ class MyBikeCard extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: 'Year: ',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   TextSpan(
                     text: '${bike.modelYear}',
@@ -91,7 +93,9 @@ class MyBikeCard extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: 'Fuel: ',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   TextSpan(
                     text: bike.fuelType,
@@ -105,7 +109,9 @@ class MyBikeCard extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: 'Mileage: ',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   TextSpan(
                     text: '${bike.expectedMileage.toStringAsFixed(1)} km/l',
@@ -119,7 +125,9 @@ class MyBikeCard extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: 'Tank: ',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   TextSpan(
                     text: '${bike.tankCapacity.toStringAsFixed(1)} L',
@@ -134,7 +142,9 @@ class MyBikeCard extends StatelessWidget {
                   children: [
                     TextSpan(
                       text: 'Reserve: ',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     TextSpan(
                       text: '${bike.reserveCapacity!.toStringAsFixed(1)} L',
@@ -149,22 +159,30 @@ class MyBikeCard extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: 'Updated: ',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold, color: Colors.grey),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
                   ),
                   TextSpan(
                     text: bike.updatedAt,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                   ),
                 ],
               ),
             ),
             Align(
-                alignment: Alignment.centerRight,
-                child: FilledButton(onPressed: () => onAction(), child: Text("Remove")))
+              alignment: Alignment.centerRight,
+              child: FilledButton(
+                onPressed: () => onAction(),
+                child: Text("Remove"),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-

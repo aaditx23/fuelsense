@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fuelsense/data/models/auth/request.dart';
+import 'package:fuelsense/domain/entities/auth/login_request.dart';
 import 'package:fuelsense/presentation/screens/auth/login/login_notifier.dart';
 import 'package:fuelsense/presentation/screens/auth/login/login_state.dart';
 import 'package:fuelsense/presentation/widgets/password_field.dart';

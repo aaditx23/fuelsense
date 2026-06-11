@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:fuelsense/data/models/bike/bike_model.dart';
+import 'package:fuelsense/domain/entities/bike/bike.dart';
 
 class BikeCard extends StatelessWidget {
-  final BikeModel bike;
+  final Bike bike;
   final Function onTap;
   final Widget? trailingIcon;
 

@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:fuelsense/data/models/bike/bike_model.dart';
+import 'package:fuelsense/domain/entities/bike/bike.dart';
 
 Future<void> bikeDetails(
   BuildContext context,
-  BikeModel bike,
+  Bike bike,
   List<Widget> actions,
 ) async {
   return showDialog(
@@ -141,7 +141,7 @@ Future<void> bikeDetails(
                       ),
                     ),
                     TextSpan(
-                      text: '${bike.reserveCapacity!.toStringAsFixed(1)} L',
+                      text: '${bike.reserveCapacity!.toStringAsFixed(2)} L',
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],

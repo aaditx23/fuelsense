@@ -1,10 +1,10 @@
-import 'package:fuelsense/data/models/bike/bike_model.dart';
+import 'package:fuelsense/domain/entities/bike/bike.dart';
 
 class AddBikeState {
   final bool isLoading;
   final bool isSuccess;
   final String? message;
-  final BikeModel? bike;
+  final Bike? bike;
 
   AddBikeState({
     required this.isLoading,
@@ -17,7 +17,7 @@ class AddBikeState {
     bool? isLoading,
     bool? isSuccess,
     String? message,
-    BikeModel? bike,
+    Bike? bike,
   }) {
     return AddBikeState(
       isLoading: isLoading ?? this.isLoading,
