@@ -60,11 +60,10 @@ class BikeRepository {
   ) async {
     final json = bikeRequest.toJson();
     final response = await http.post(
-      Uri.parse("$baseUrl/bikes/submit"),
+      Uri.parse("$baseUrl/bikes/submit/"),
       headers: authorizedHeader(token),
-      body: json,
+      body: jsonEncode(json),
     );
-
     final jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
     final bikeResponse = AddBikeResponse.fromJson(jsonResponse);
     return bikeResponse;

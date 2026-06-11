@@ -5,18 +5,18 @@ import 'package:fuelsense/views/widgets/image_picker/request_permission.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-Future<String?> pickCropImage(ImageSource source) async{
+Future<String?> pickCropImage(ImageSource source) async {
   await requestPermissions();
   final picker = ImagePicker();
   final pickedImage = await picker.pickImage(source: source);
-  if(pickedImage == null) return null;
+  if (pickedImage == null) return null;
 
   final cropped = await ImageCropper().cropImage(
     sourcePath: pickedImage.path,
     compressFormat: ImageCompressFormat.jpg,
     compressQuality: 80, // Lower quality for smaller size
-    maxWidth: 128, // Limit width
-    maxHeight: 128, // Limit height
+    maxWidth: 512, // Limit width
+    maxHeight: 512, // Limit height
     uiSettings: [
       AndroidUiSettings(
         toolbarTitle: "Crop Image",
@@ -24,16 +24,16 @@ Future<String?> pickCropImage(ImageSource source) async{
         aspectRatioPresets: [
           CropAspectRatioPreset.square,
           CropAspectRatioPreset.original,
-        ]
+        ],
       ),
       IOSUiSettings(
         title: "Crop Image",
         aspectRatioPresets: [
           CropAspectRatioPreset.square,
-          CropAspectRatioPreset.original
-        ]
-      )
-    ]
+          CropAspectRatioPreset.original,
+        ],
+      ),
+    ],
   );
 
   if (cropped == null) return null;
@@ -42,6 +42,4 @@ Future<String?> pickCropImage(ImageSource source) async{
   final base64String = base64Encode(bytes);
 
   return base64String;
-
-
 }

@@ -7,27 +7,31 @@ import 'package:fuelsense/di/setup_di.dart';
 import 'package:fuelsense/views/screens/add_bike/add_bike_state.dart';
 
 class AddBikeNotifier extends StateNotifier<AddBikeState> {
-  final BikeRepository bikeRepository;
-  final BikeDao bikeDao;
-  final AppSharedPreferences prefs;
+  final BikeRepository _bikeRepository;
+  final BikeDao _bikeDao;
+  final AppSharedPreferences _prefs;
 
   AddBikeNotifier({
-    required this.bikeRepository,
-    required this.bikeDao,
-    required this.prefs,
-  }) : super(AddBikeState(isLoading: false, isSuccess: false));
+    required BikeRepository bikeRepository,
+    required BikeDao bikeDao,
+    required AppSharedPreferences prefs,
+  }) : _prefs = prefs,
+       _bikeDao = bikeDao,
+       _bikeRepository = bikeRepository,
+       super(AddBikeState(isLoading: false, isSuccess: false, message: null));
 
   Future<void> submitBike(BikeRequest bikeRequest) async {
-    final token = prefs.getToken();
+    final token = _prefs.getToken();
     if (token == null) return;
     state = state.copyWith(isLoading: true, message: null);
     try {
-      final response = await bikeRepository.submitBike(token, bikeRequest);
+      final response = await _bikeRepository.submitBike(token, bikeRequest);
       state = state.copyWith(
         isLoading: false,
         isSuccess: response.success,
         message: response.message,
       );
+      print(response);
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

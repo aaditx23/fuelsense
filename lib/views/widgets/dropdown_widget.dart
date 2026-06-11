@@ -5,12 +5,14 @@ class DropdownWidget extends StatelessWidget {
   final ValueChanged<String?> onChanged;
   final String labelText;
   final IconData prefixIcon;
+  final bool enabled;
   const DropdownWidget({
     super.key,
     required this.items,
     required this.onChanged,
     required this.labelText,
     required this.prefixIcon,
+    this.enabled = false
   });
 
   @override

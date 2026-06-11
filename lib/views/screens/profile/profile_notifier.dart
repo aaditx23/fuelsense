@@ -7,23 +7,23 @@ import 'package:fuelsense/views/screens/profile/profile_state.dart';
 import 'package:fuelsense/di/setup_di.dart';
 
 class ProfileNotifier extends StateNotifier<ProfileState> {
-  final UserDao userDao;
-  final AppSharedPreferences prefs;
+  final UserDao _userDao;
+  final AppSharedPreferences _prefs;
 
-  ProfileNotifier({required this.userDao, required this.prefs}) : super(ProfileState(isLoading: true)) {
+  ProfileNotifier({required UserDao userDao, required AppSharedPreferences prefs}) : _prefs = prefs, _userDao = userDao, super(ProfileState(isLoading: true)) {
     loadProfile();
   }
 
   Future<void> loadProfile() async {
     state = state.copyWith(isLoading: true, message: null, user: null);
-    final userId = prefs.getUserId();
+    final userId = _prefs.getUserId();
     print("USR ID: $userId");
-    print(prefs.getToken());
+    print(_prefs.getToken());
     if (userId == null) {
       state = state.copyWith(isLoading: false, message: 'User not logged in');
       return;
     }
-    final user = await userDao.getUserById(userId);
+    final user = await _userDao.getUserById(userId);
     if (user == null) {
       state = state.copyWith(isLoading: false, message: 'User not found');
       return;

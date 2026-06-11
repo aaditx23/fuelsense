@@ -8,31 +8,33 @@ import 'package:fuelsense/views/screens/auth/login/login_state.dart';
 import 'package:http/http.dart';
 
 class LoginNotifier extends StateNotifier<LoginState> {
-  final AuthRepository authRepository;
-  final UserDao userDao;
+  final AuthRepository _authRepository;
+  final UserDao _userDao;
   final AppSharedPreferences prefs;
   LoginNotifier({
-    required this.authRepository,
-    required this.userDao,
-    required this.prefs
-}) : super(LoginState(isLoading: false, isSuccess: false, message: null));
+    required AuthRepository authRepository,
+    required UserDao userDao,
+    required this.prefs,
+  }) : _userDao = userDao,
+       _authRepository = authRepository,
+       super(LoginState(isLoading: false, isSuccess: false, message: null));
 
-  void resetState(){
+  void resetState() {
     state = state.empty();
   }
 
   Future<void> login(LoginRequest loginRequest) async {
     state = state.copyWith(isLoading: true, message: null, isSuccess: false);
-    try{
-      final response = await authRepository.login(loginRequest);
+    try {
+      final response = await _authRepository.login(loginRequest);
 
       final userResponse = response.data;
-      if(userResponse != null){
+      if (userResponse != null) {
         final user = userResponse.toEntity(loginRequest.password);
 
-        final userId = await userDao.createUser(user);
+        final userId = await _userDao.createUser(user);
         prefs.saveUserId(userId);
-        if(response.token != null) await prefs.saveToken(response.token!);
+        if (response.token != null) await prefs.saveToken(response.token!);
       }
       state = state.copyWith(
         isLoading: false,
@@ -41,8 +43,7 @@ class LoginNotifier extends StateNotifier<LoginState> {
         code: response.code,
       );
       print(response.token);
-    }
-    catch (e){
+    } catch (e) {
       state = state.copyWith(
         isLoading: false,
         isSuccess: false,
@@ -59,6 +60,6 @@ final loginNotifier = StateNotifierProvider((ref) {
   return LoginNotifier(
     authRepository: authRepository,
     userDao: userDao,
-    prefs: prefs
+    prefs: prefs,
   );
 });

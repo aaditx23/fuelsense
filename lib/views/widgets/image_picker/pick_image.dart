@@ -10,12 +10,14 @@ class PickImage extends StatefulWidget {
   final void Function(String?) onSet;
   final String defaultImage;
   final bool circle;
+  final String? selectedImage;
   const PickImage({
     super.key,
     this.size = 80,
     required this.onSet,
     required this.defaultImage,
     required this.circle,
+    this.selectedImage
   });
 
   @override
@@ -29,7 +31,7 @@ class _PickImageState extends State<PickImage> {
     return GestureDetector(
       onTap: () async {
         image = await pickCropImage(ImageSource.gallery);
-        widget.onSet(image);
+        if (image != null) widget.onSet(image);
         setState(() {});
       }, // Use the provided onClick callback
       child: Stack(

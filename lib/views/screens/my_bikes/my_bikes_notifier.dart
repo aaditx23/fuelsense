@@ -9,18 +9,18 @@ import '../../../data/local/shared_preferences/shared_preferences.dart';
 import 'my_bike_state.dart';
 
 class MyBikeNotifier extends StateNotifier<MyBikeState> {
-  final BikeRepository repository;
-  final BikeDao bikeDao;
-  final AppSharedPreferences prefs;
+  final BikeRepository _bikeRepository;
+  final BikeDao _bikeDao;
+  final AppSharedPreferences _prefs;
 
-  MyBikeNotifier({required this.repository, required this.bikeDao, required this.prefs}) : super(MyBikeState());
+  MyBikeNotifier({required BikeRepository repository, required BikeDao bikeDao, required AppSharedPreferences prefs}) : _prefs = prefs, _bikeDao = bikeDao, _bikeRepository = repository, super(MyBikeState());
 
   Future<void> getMyBikes() async {
-    final token = prefs.getToken();
+    final token = _prefs.getToken();
     if(token == null) return;
     state = state.copyWith(isLoading: true, message: null);
     try {
-      final response = await repository.getMyBikes(token);
+      final response = await _bikeRepository.getMyBikes(token);
       state = state.copyWith(
           isLoading: false,
           isSuccess: response.success,
@@ -33,11 +33,11 @@ class MyBikeNotifier extends StateNotifier<MyBikeState> {
   }
 
   Future<void> removeBike(int bikeId) async{
-    final token = prefs.getToken();
+    final token = _prefs.getToken();
     if (token == null) return ;
     state = state.copyWith(isLoading: true, message: null);
     try{
-      final response = await repository.removeMyBike(token, bikeId);
+      final response = await _bikeRepository.removeMyBike(token, bikeId);
       final myBikes = state.myBikes;
       myBikes.removeWhere((bike) => bike.id ==bikeId);
       state = state.copyWith(

@@ -20,7 +20,9 @@ class _BikesScreenState extends ConsumerState<MyBikesScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => ref.read(myBikesNotifierProvider.notifier).getMyBikes());
+    Future.microtask(
+      () => ref.read(myBikesNotifierProvider.notifier).getMyBikes(),
+    );
   }
 
   List<BikeModel> _filterBikes(List<BikeModel> bikes) {
@@ -30,7 +32,9 @@ class _BikesScreenState extends ConsumerState<MyBikesScreen> {
       return bike.brand.toLowerCase().contains(query) ||
           bike.model.toLowerCase().contains(query) ||
           bike.modelYear.toString().contains(query) ||
-          "${bike.brand} ${bike.model} ${bike.modelYear}".toLowerCase().contains(query) ||
+          "${bike.brand} ${bike.model} ${bike.modelYear}"
+              .toLowerCase()
+              .contains(query) ||
           bike.engineCc.toString().contains(query) ||
           bike.fuelType.toLowerCase().contains(query) ||
           bike.expectedMileage.toString().contains(query) ||
@@ -62,22 +66,34 @@ class _BikesScreenState extends ConsumerState<MyBikesScreen> {
             child: state.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : state.message != null && !state.isSuccess
-                    ? Center(child: Text(state.message!))
-                    : state.myBikes.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: filteredBikes.length,
-                          itemBuilder: (context, index) {
-                            final bike = filteredBikes[index];
-                            return MyBikeCard(bike: bike, onAction: () {
-                              ref.read(myBikesNotifierProvider.notifier).removeBike(bike.id);
-                            },);
-                          },
-                        )
-                        : TextButton(onPressed: (){
+                ? Center(child: Text(state.message!))
+                : state.myBikes.isNotEmpty
+                ? ListView.builder(
+                    itemCount: filteredBikes.length,
+                    itemBuilder: (context, index) {
+                      final bike = filteredBikes[index];
+                      return MyBikeCard(
+                        bike: bike,
+                        onAction: () {
+                          ref
+                              .read(myBikesNotifierProvider.notifier)
+                              .removeBike(bike.id);
+                        },
+                      );
+                    },
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () {
                           Navigator.pushReplacementNamed(context, "/bikes");
-                          }, child: Text("Click Here to browse and add bikes"),
-            )
-            ,
+                        },
+                        child: Text("Click Here to browse and add bikes"),
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),

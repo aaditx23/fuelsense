@@ -8,29 +8,32 @@ import 'package:fuelsense/views/screens/auth/signup/signup_state.dart';
 import 'package:fuelsense/data/local/dao/user_dao.dart';
 
 class SignupNotifier extends StateNotifier<SignupState> {
-  final AuthRepository authRepository;
-  final UserDao userDao;
-  final AppSharedPreferences prefs;
+  final AuthRepository _authRepository;
+  final UserDao _userDao;
+  final AppSharedPreferences _prefs;
   SignupNotifier({
-    required this.authRepository,
-    required this.userDao,
-    required this.prefs
-  }) : super(SignupState(isLoading: false, isSuccess: false, message: null));
+    required AuthRepository authRepository,
+    required UserDao userDao,
+    required AppSharedPreferences prefs,
+  }) : _prefs = prefs,
+       _userDao = userDao,
+       _authRepository = authRepository,
+       super(SignupState(isLoading: false, isSuccess: false, message: null));
 
-  void reset(){
+  void reset() {
     state = state.empty();
   }
+
   Future<void> signup(SignupRequest signupRequest) async {
     state = state.copyWith(isLoading: true, message: null);
-    try{
-      final response = await authRepository.signup(signupRequest);
+    try {
+      final response = await _authRepository.signup(signupRequest);
       final userResponse = response.data;
-      if(userResponse != null){
+      if (userResponse != null) {
         final user = userResponse.toEntity(signupRequest.password);
-        final userId = await userDao.createUser(user);
-        prefs.saveUserId(userId);
-        if(response.token != null) await prefs.saveToken(response.token!);
-
+        final userId = await _userDao.createUser(user);
+        _prefs.saveUserId(userId);
+        if (response.token != null) await _prefs.saveToken(response.token!);
       }
       state = state.copyWith(
         isLoading: false,
@@ -38,26 +41,23 @@ class SignupNotifier extends StateNotifier<SignupState> {
         message: response.message,
         code: response.code,
       );
-    }
-
-    catch (e){
-    state = state.copyWith(
-    isLoading: false,
-    isSuccess: false,
-    message: e.toString(),
-    );
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        isSuccess: false,
+        message: e.toString(),
+      );
     }
   }
 }
 
-final signupNotifier = StateNotifierProvider((ref) {
+final signupNotifierProvider = StateNotifierProvider((ref) {
   final AuthRepository authRepository = getIt();
   final UserDao userDao = getIt();
   final AppSharedPreferences prefs = getIt();
   return SignupNotifier(
     authRepository: authRepository,
     userDao: userDao,
-    prefs: prefs
+    prefs: prefs,
   );
 });
-

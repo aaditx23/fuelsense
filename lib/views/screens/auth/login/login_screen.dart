@@ -5,6 +5,7 @@ import 'package:fuelsense/views/screens/auth/login/login_notifier.dart';
 import 'package:fuelsense/views/screens/auth/login/login_state.dart';
 import 'package:fuelsense/views/widgets/password_field.dart';
 import 'package:fuelsense/views/widgets/outlined_text_field.dart';
+import 'package:fuelsense/views/widgets/response_text.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -37,7 +38,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Widget build(BuildContext context) {
     final LoginState state = ref.watch(loginNotifier);
 
-
     ref.listen(loginNotifier, (prev, next) {
       if (next.isSuccess) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -49,7 +49,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
 
     void onLogin() {
-      if(_formKey.currentState!.validate()){
+      if (_formKey.currentState!.validate()) {
         final loginRequest = LoginRequest(
           username: _emailController.text.trim(),
           password: _passwordController.text.trim(),
@@ -95,7 +95,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: const Icon(Icons.email),
                         validator: (v) {
-                          if (v == null || v.trim().isEmpty) return 'Enter Email/Username';
+                          if (v == null || v.trim().isEmpty)
+                            return 'Enter Email/Username';
                           return null;
                         },
                       ),
@@ -118,13 +119,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       const SizedBox(height: 8),
                       ElevatedButton(
-                        onPressed: state.isLoading
-                        ? null
-                        : () => onLogin(),
+                        onPressed: state.isLoading ? null : () => onLogin(),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           elevation: 0,
-                          backgroundColor: Theme.of(context).colorScheme.primaryContainer
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primaryContainer,
                         ),
 
                         child: state.isLoading
@@ -139,19 +140,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                       const SizedBox(height: 12),
                       if (state.message != null && !state.isLoading)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            state.message!,
-                            style: TextStyle(
-                              color: state.isSuccess
-                                  ? Colors.lightGreen
-                                  : Colors.red,
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                        ResponseText(
+                          success: state.isSuccess,
+                          message: state.message!,
                         ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

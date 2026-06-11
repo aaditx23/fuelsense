@@ -1,20 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fuelsense/data/remote/bike/schema/bike_request.dart';
+import 'package:fuelsense/views/screens/add_bike/add_bike_notifier.dart';
+import 'package:fuelsense/views/screens/add_bike/add_bike_state.dart';
 import 'package:fuelsense/views/screens/add_bike/add_bike_validators.dart';
 import 'package:fuelsense/views/widgets/common_scaffold.dart';
+import 'package:fuelsense/views/widgets/dialog/message_dialog.dart';
 import 'package:fuelsense/views/widgets/dropdown_widget.dart';
 import 'package:fuelsense/views/widgets/image_picker/pick_image.dart';
 import 'package:fuelsense/views/widgets/outlined_text_field.dart';
 
 import '../../../data/dropdown_values/fuel_type.dart';
 
-class AddBikeScreen extends StatefulWidget {
+class AddBikeScreen extends ConsumerStatefulWidget {
   const AddBikeScreen({super.key});
 
   @override
-  State<AddBikeScreen> createState() => _AddBikeScreenState();
+  ConsumerState<AddBikeScreen> createState() => _AddBikeScreenState();
 }
 
-class _AddBikeScreenState extends State<AddBikeScreen> {
+class _AddBikeScreenState extends ConsumerState<AddBikeScreen> {
   final _formKey = GlobalKey<FormState>();
 
   // Text controllers for form fields
@@ -28,6 +33,7 @@ class _AddBikeScreenState extends State<AddBikeScreen> {
 
   // Fuel type selection
   String _selectedFuelType = fuelType[0];
+  String? _selectedImage;
 
   @override
   void dispose() {
@@ -41,17 +47,46 @@ class _AddBikeScreenState extends State<AddBikeScreen> {
     super.dispose();
   }
 
-  void _handleSubmit() {
-    if (_formKey.currentState!.validate()) {}
+  Future<void> _handleSubmit() async {
+    if (_formKey.currentState!.validate()) {
+      final bikeRequest = BikeRequest(
+        brand: _brandController.text,
+        model: _modelController.text,
+        engineCc: int.parse(_engineCcController.text.trim()),
+        modelYear: int.parse(_modelYearController.text.trim()),
+        fuelType: _selectedFuelType,
+        expectedMileage: double.parse(_expectedMileageController.text.trim()),
+        tankCapacity: double.parse(_tankCapacityController.text.trim()),
+        image: null,
+      );
+      await ref.read(addBikeNotifierProvider.notifier).submitBike(bikeRequest);
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) => MessageDialog(
+            title: "Add New Bike",
+            message: ref.read(addBikeNotifierProvider).message!,
+          ),
+        );
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(addBikeNotifierProvider);
+
     return CommonScaffold(
       title: 'Add Bike',
       fab: FloatingActionButton(
-        onPressed: _handleSubmit,
-        child: Icon(Icons.cloud_upload),
+        onPressed: state.isLoading
+            ? null
+            : () async {
+                await _handleSubmit();
+              },
+        child: state.isLoading
+            ? CircularProgressIndicator()
+            : Icon(Icons.cloud_upload),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -61,12 +96,16 @@ class _AddBikeScreenState extends State<AddBikeScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               PickImage(
-                onSet: (value) {},
+                onSet: (value) {
+                  if (value != null) _selectedImage = value;
+                  print(_selectedImage);
+                },
                 defaultImage: "assets/images/default_bike.png",
                 size: 200,
                 circle: false,
               ),
               const SizedBox(height: 16),
+
               // Brand field
               OutlinedTextField(
                 controller: _brandController,

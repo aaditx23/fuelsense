@@ -8,6 +8,7 @@ import 'package:fuelsense/views/widgets/dropdown_widget.dart';
 import 'package:fuelsense/views/widgets/image_picker/pick_crop_image.dart';
 import 'package:fuelsense/views/widgets/image_picker/pick_image.dart';
 import 'package:fuelsense/views/widgets/password_field.dart';
+import 'package:fuelsense/views/widgets/response_text.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../widgets/outlined_text_field.dart';
@@ -32,7 +33,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      ref.read(signupNotifier.notifier).reset();
+      ref.read(signupNotifierProvider.notifier).reset();
     });
   }
 
@@ -47,9 +48,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final SignupState state = ref.watch(signupNotifier);
+    final SignupState state = ref.watch(signupNotifierProvider);
 
-    ref.listen(signupNotifier, (prev, next) {
+    ref.listen(signupNotifierProvider, (prev, next) {
       if (next.isSuccess) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
@@ -69,7 +70,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           role: _selectedRole,
         );
         print("ISGNUP REQUEST: ${signupRequest.profileImage}");
-        ref.read(signupNotifier.notifier).signup(signupRequest);
+        ref.read(signupNotifierProvider.notifier).signup(signupRequest);
       }
     }
 
@@ -109,7 +110,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           _profileImage = image;
                         },
                         defaultImage: "assets/images/user_default.png",
-                        circle: false,
+                        circle: true,
                       ),
                       const SizedBox(height: 12),
                       OutlinedTextField(
@@ -170,19 +171,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       ),
                       const SizedBox(height: 12),
                       if (state.message != null && !state.isLoading)
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            state.message!,
-                            style: TextStyle(
-                              color: state.isSuccess
-                                  ? Colors.lightGreen
-                                  : Colors.red,
-                              fontWeight: FontWeight.normal,
-                              fontSize: 12,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                        ResponseText(
+                          success: state.isSuccess,
+                          message: state.message!,
                         ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
