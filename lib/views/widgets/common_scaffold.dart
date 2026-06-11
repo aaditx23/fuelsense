@@ -1,0 +1,29 @@
+import 'package:flutter/material.dart';
+import 'package:fuelsense/views/widgets/nav_drawer.dart';
+
+class CommonScaffold extends StatelessWidget {
+  final Widget body;
+  final String? title;
+  final bool showDrawer;
+  final List<Widget>? actions;
+
+  const CommonScaffold({
+    Key? key,
+    required this.body,
+    this.title,
+    this.showDrawer = true,
+    this.actions,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: title != null ? Text(title!) : null,
+        actions: actions,
+      ),
+      drawer: showDrawer ? const NavDrawer() : null,
+      body: body,
+    );
+  }
+}

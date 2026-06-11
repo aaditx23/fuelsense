@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fuelsense/views/screens/screen01/screen01_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fuelsense/views/widgets/nav_drawer.dart';
 
 class Screen01 extends ConsumerStatefulWidget {
   const Screen01({super.key});
@@ -40,6 +41,7 @@ class _Screen01State extends ConsumerState<Screen01> {
 
     return Scaffold(
       appBar: AppBar(),
+      drawer: NavDrawer(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(context, "/screen02");
