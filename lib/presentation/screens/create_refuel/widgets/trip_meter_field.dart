@@ -85,10 +85,6 @@ class _TripMeterFieldState extends ConsumerState<TripMeterField>
     final state = ref.watch(createRefuelNotifierProvider);
     final notifier = ref.read(createRefuelNotifierProvider.notifier);
 
-    final label = widget.isFirstEntry
-        ? 'Trip Meter Reading (km) *'
-        : 'Trip Meter Reading (km)${state.odometerReading == null ? ' *' : ''}';
-
     return AnimatedBuilder(
       animation: _shakeAnimation,
       builder: (context, child) => Transform.translate(
@@ -103,14 +99,17 @@ class _TripMeterFieldState extends ConsumerState<TripMeterField>
       ),
       child: OutlinedTextField(
         controller: _controller,
-        labelText: label,
-        hintText: 'Enter trip meter reading',
+        labelText: widget.isFirstEntry
+            ? 'Trip *'
+            : 'Trip${state.odometerReading == null ? ' *' : ''}',
+        hintText: '0 – 999.99',
+        hintStyle: const TextStyle(fontSize: 11),
         prefixIcon: const Icon(Icons.speed_rounded),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         enabled: widget.enabled,
         errorText: _errorText,
         inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+          FilteringTextInputFormatter.allow(RegExp(r'^\d{0,3}\.?\d{0,2}')),
           _TripMeterInputFormatter(onExceeded: _triggerExceeded),
         ],
         onChanged: (value) {

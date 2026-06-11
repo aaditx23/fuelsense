@@ -115,15 +115,26 @@ class _CreateRefuelScreenState extends ConsumerState<CreateRefuelScreen> {
                             isHighlighted: isFirstEntry,
                           ),
                           const SizedBox(height: 12),
-                          TripMeterField(
-                            enabled: !state.hasIncompleteEntry,
-                            isFirstEntry: isFirstEntry,
-                          ),
-                          const SizedBox(height: 12),
-                          OdometerField(
-                            enabled: !state.hasIncompleteEntry,
-                            isFirstEntry: isFirstEntry,
-                            userBikeId: 1,
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                flex: 2,
+                                child: TripMeterField(
+                                  enabled: !state.hasIncompleteEntry,
+                                  isFirstEntry: isFirstEntry,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Flexible(
+                                flex: 3,
+                                child: OdometerField(
+                                  enabled: !state.hasIncompleteEntry,
+                                  isFirstEntry: isFirstEntry,
+                                  userBikeId: 1,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

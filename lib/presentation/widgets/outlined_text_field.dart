@@ -18,6 +18,7 @@ class OutlinedTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final TextStyle? labelStyle;
   final TextStyle? hintStyle;
+  final TextStyle? floatingLabelStyle;
 
   const OutlinedTextField({
     Key? key,
@@ -37,6 +38,7 @@ class OutlinedTextField extends StatelessWidget {
     this.inputFormatters,
     this.labelStyle,
     this.hintStyle,
+    this.floatingLabelStyle,
   }) : assert(
          controller == null || initialValue == null,
          'controller and initialValue cannot both be set',
@@ -57,6 +59,7 @@ class OutlinedTextField extends StatelessWidget {
         suffixIcon: suffixIcon,
         labelStyle: labelStyle,
         hintStyle: hintStyle,
+        floatingLabelStyle: floatingLabelStyle,
       ),
       validator: validator,
       keyboardType: keyboardType,

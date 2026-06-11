@@ -56,10 +56,9 @@ class _FuelTotalCostFieldState extends ConsumerState<FuelTotalCostField> {
       onFocusChange: (focused) => _isFocused = focused,
       child: OutlinedTextField(
         controller: _controller,
-        labelText: 'Total Cost (৳)',
+        labelText: 'Cost (৳)',
         hintText: 'Enter total cost',
-        labelStyle: const TextStyle(fontSize: 12),
-        hintStyle: const TextStyle(fontSize: 12),
+        hintStyle: const TextStyle(fontSize: 11),
         prefixIcon: const Icon(Icons.receipt_long),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         onChanged: (value) {

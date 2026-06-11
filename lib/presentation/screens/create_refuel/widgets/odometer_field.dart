@@ -92,8 +92,8 @@ class _OdometerFieldState extends ConsumerState<OdometerField> {
     });
 
     final label = widget.isFirstEntry
-        ? 'Odometer Reading (km) *'
-        : 'Odometer Reading (km)${state.tripMeterReading == null ? ' *' : ''}';
+        ? 'ODO *'
+        : 'ODO${state.tripMeterReading == null ? ' *' : ''}';
 
     return Focus(
       onFocusChange: (focused) {
@@ -104,13 +104,14 @@ class _OdometerFieldState extends ConsumerState<OdometerField> {
         controller: _controller,
         labelText: label,
         hintText: lastOdometer != null
-            ? 'Last: ${lastOdometer.toStringAsFixed(1)} km'
-            : 'Enter odometer reading',
+            ? 'Last: ${lastOdometer.toStringAsFixed(1)}'
+            : '0 – 999999.99',
+        hintStyle: const TextStyle(fontSize: 11),
         prefixIcon: const Icon(Icons.directions_car_rounded),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         enabled: widget.enabled,
         inputFormatters: [
-          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+          FilteringTextInputFormatter.allow(RegExp(r'^\d{0,6}\.?\d{0,2}')),
         ],
         onChanged: (value) {
           _isManual = true;

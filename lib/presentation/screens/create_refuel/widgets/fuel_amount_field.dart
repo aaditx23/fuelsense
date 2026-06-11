@@ -57,10 +57,9 @@ class _FuelAmountFieldState extends ConsumerState<FuelAmountField> {
       onFocusChange: (focused) => _isFocused = focused,
       child: OutlinedTextField(
         controller: _controller,
-        labelText: 'Fuel Amount (L)',
+        labelText: 'Amount (L)',
         hintText: 'Enter liters',
-        labelStyle: const TextStyle(fontSize: 12),
-        hintStyle: const TextStyle(fontSize: 12),
+        hintStyle: const TextStyle(fontSize: 11),
         prefixIcon: const Icon(Icons.local_gas_station_rounded),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         onChanged: (value) {
