@@ -1,0 +1,30 @@
+import 'package:fuelsense/data/datasources/local/dao/user_dao.dart';
+import 'package:fuelsense/data/models/auth/request.dart';
+import 'package:fuelsense/data/models/auth/auth_response.dart';
+import 'package:fuelsense/data/datasources/local/shared_preferences/shared_preferences.dart';
+import 'package:fuelsense/domain/repositories/auth_repository.dart';
+
+class LoginUseCase {
+  final AuthRepository authRepository;
+  final UserDao userDao;
+  final AppSharedPreferences prefs;
+
+  LoginUseCase(this.authRepository, this.userDao, this.prefs);
+
+  Future<AuthResponse> call(LoginRequest loginRequest) async {
+    final response = await authRepository.login(loginRequest);
+
+    final userResponse = response.data;
+    if (userResponse != null) {
+      final user = userResponse.toEntity(loginRequest.password);
+
+      await userDao.deleteAll();
+      final userId = await userDao.createUser(user);
+      prefs.saveUserId(userId);
+      prefs.saveRole(user.role);
+      if (response.token != null) await prefs.saveToken(response.token!);
+    }
+
+    return response;
+  }
+}

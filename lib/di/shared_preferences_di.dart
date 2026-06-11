@@ -1,4 +1,4 @@
-import 'package:fuelsense/data/local/shared_preferences/shared_preferences.dart';
+import 'package:fuelsense/data/datasources/local/shared_preferences/shared_preferences.dart';
 import 'package:fuelsense/di/setup_di.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

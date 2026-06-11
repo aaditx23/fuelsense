@@ -1,0 +1,75 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:fuelsense/presentation/widgets/image_picker/pick_crop_image.dart';
+import 'package:fuelsense/presentation/widgets/image_picker/view_image.dart';
+import 'package:image_picker/image_picker.dart';
+
+class PickImage extends StatefulWidget {
+  final double size;
+  final void Function(String?) onSet;
+  final String defaultImage;
+  final bool circle;
+  final String? selectedImage;
+  const PickImage({
+    super.key,
+    this.size = 80,
+    required this.onSet,
+    required this.defaultImage,
+    required this.circle,
+    this.selectedImage,
+  });
+
+  @override
+  State<PickImage> createState() => _PickImageState();
+}
+
+class _PickImageState extends State<PickImage> {
+  String? image;
+
+  @override
+  void initState() {
+    super.initState();
+    image = widget.selectedImage;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        image = await pickCropImage(ImageSource.gallery);
+        if (image != null) {
+          widget.onSet(image);
+          setState(() {});
+        }
+      }, // Use the provided onClick callback
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          ViewImage(
+            circle: widget.circle,
+            size: widget.size,
+            isAsset: image == null,
+            image: (image == null) ? widget.defaultImage : image!,
+          ),
+
+          Positioned(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha((0.5 * 255).toInt()),
+                shape: BoxShape.circle,
+                boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2)],
+              ),
+              padding: const EdgeInsets.all(4),
+              child: Icon(
+                Icons.upload,
+                // size: widget.size * 0.22,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
